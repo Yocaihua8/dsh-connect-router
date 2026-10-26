@@ -4,25 +4,25 @@
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "627c22be7ae53170b0b8ec4f4901fc57d271beba45c8c6ffd04b12f006fc68be",
       "purpose": "文档、配置或公开仓库说明"
     },
     {
       "path": ".gitignore",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "b557c3f94e076a3e5c5413c705f99b9fcb54fefc939384b1a8e1fd81451c6a4e",
       "purpose": "文档、配置或公开仓库说明"
     },
     {
       "path": "CONTRIBUTING.md",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "eceacfe8c0aad35375805e091e23a72c294c34222c49036d5ddcfeed10821e8d",
       "purpose": "文档、配置或公开仓库说明"
     },
     {
       "path": "PRIVACY.md",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "7fcbcad748f3d75deb647c493c519d018128d52d4edfef503822fa0a21660272",
       "purpose": "文档、配置或公开仓库说明"
     },
@@ -39,15 +39,9 @@
       "purpose": "来源许可与固定文件溯源"
     },
     {
-      "path": "cordis.patch.yml",
-      "change": "added-or-not-in-before-snapshot",
-      "sha256": "13f60053d2e225e177b02791fbc52745cbd2c72cd1686ad01978ee5c9aae93c6",
-      "purpose": "文档、配置或公开仓库说明"
-    },
-    {
       "path": "docs/changes.md",
       "change": "modified",
-      "sha256": "733525f86a4aa1e6bc4206c66333ba01df819551af130d5751b02c2a39e98f51",
+      "sha256": "d2d3864c4bd4a74a71fc117e7025db0b4bdfe98693e195fd9e8e90364ccd4314",
       "purpose": "文档、配置或公开仓库说明"
     },
     {
@@ -71,7 +65,7 @@
     {
       "path": "docs/verification.md",
       "change": "modified",
-      "sha256": "008abfeaadf51ed2e0dae395dbcaadd4bb057564f9287cff8548a991b8b7c243",
+      "sha256": "98ced58551ecef9953d4fec9fba4b638ed52a52aa9814fff2a25cd20241e94cd",
       "purpose": "文档、配置或公开仓库说明"
     },
     {
@@ -106,13 +100,13 @@
     },
     {
       "path": "src/client/feedback.tsx",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "4bd4b9bbef53d7ba1506f20a972923573f7432db7656d2c9697f6f8349dd8272",
       "purpose": "正式设置、额度、上下文或反馈界面"
     },
     {
       "path": "src/client/quota.ts",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "ec48292216cf130638ee139b923db13ead33957bff5499734fbe3c74d0a5e320",
       "purpose": "正式设置、额度、上下文或反馈界面"
     },
@@ -130,7 +124,7 @@
     },
     {
       "path": "src/host/feedback.ts",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "fdf5e4da837faa0253c7618c8fb0beb2ca0a0c297c1a650e11af312514cccf32",
       "purpose": "GitHub 设备授权、脱敏报告与单次提交回执"
     },
@@ -148,7 +142,7 @@
     },
     {
       "path": "src/shared/feedback.ts",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "47d1be5e22a18addf599f61be412bab6bcd0b6dd9df05024c2df2cbe29756d9e",
       "purpose": "共享版本、反馈类型和公开 App 标识"
     },
@@ -160,19 +154,19 @@
     },
     {
       "path": "test/feedback.test.ts",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "11ea608f980de7df91846c934aaeba64fd618d33b0d0225a0d2d359b2b28ddb6",
       "purpose": "行为回归测试"
     },
     {
       "path": "test/quota-context.test.ts",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "ce96a60e75b9afe0d570807df31ccfbe001f4f5f58ab3b9f7aa5da5668c925b9",
       "purpose": "行为回归测试"
     },
     {
       "path": "third-party/opencode-MIT.txt",
-      "change": "added-or-not-in-before-snapshot",
+      "change": "added",
       "sha256": "8a403f5bf5f430c7ddf7654a320e54e0126b5e0532149902a679b317dcc4975b",
       "purpose": "来源许可与固定文件溯源"
     },
@@ -181,24 +175,6 @@
       "change": "modified",
       "sha256": "dcd69e9cbeca7f62bd7e794501b37937b3da2574f88c8edc1bdc6a50196b56ab",
       "purpose": "来源许可与固定文件溯源"
-    },
-    {
-      "path": "tsconfig.client.json",
-      "change": "added-or-not-in-before-snapshot",
-      "sha256": "54144fcfe3472c2c8113b348246a065c465f9b49776eb65bb3c1de57d3eb79bf",
-      "purpose": "文档、配置或公开仓库说明"
-    },
-    {
-      "path": "tsconfig.json",
-      "change": "added-or-not-in-before-snapshot",
-      "sha256": "056378f1f24bd9c97cca4118b43d03cf90e6fa6a96bfd3ca0f4e0f8c8936d622",
-      "purpose": "文档、配置或公开仓库说明"
-    },
-    {
-      "path": "tsconfig.test.json",
-      "change": "added-or-not-in-before-snapshot",
-      "sha256": "aebafb632091cce73ffcdafc8c13e4e810f28afd044c76ee98e7e85b67e55487",
-      "purpose": "文档、配置或公开仓库说明"
     }
   ]
 }

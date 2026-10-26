@@ -1,6 +1,6 @@
 # 实施与文件范围
 
-独立插件位于 dsh-connect-router，原 OpenCode 工作树保留。逐文件 SHA256 见 checkpoint-files.json；相对源码备份的增改见 revision-files.json。清单排除依赖、构建产物、真实 home 和清单自身。
+独立插件位于 dsh-connect-router，原 OpenCode 工作树保留。上一阶段逐文件 SHA256 留档于 checkpoint-files.json，相应增改留档于 revision-files.json；本轮文件及哈希见 revision-alpha2-files.json。清单排除依赖、构建产物、真实 home 和清单自身。
 
 - src/client/：正式原生设置、账号池/额度、平铺上下文、能力/费用、福利、诊断、草稿、原生续写及窄屏样式；无演示目录。
 - src/host/service.ts 与 src/index.ts：owner RPC、生命周期、授权/签到/目录/日志和恢复状态。
