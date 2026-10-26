@@ -2,7 +2,7 @@
   "name": "dsh-connect-router",
   "displayName": "Connect Router",
   "description": "在 DSH 中统一连接 WorkBuddy 与 OpenCode，管理模型、额度和福利。",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "private": true,
   "license": "MIT",
   "type": "module",

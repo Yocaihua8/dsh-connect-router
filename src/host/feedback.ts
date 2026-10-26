@@ -62,12 +62,15 @@ export function makeReport(
         aliases.get(account)))
       : undefined;
   // Explicit allowlist: never spread arbitrary diagnostic objects into a public report.
+  const publicRoute = (s = "") => { try { return redactFeedback(decodeURIComponent(s)); } catch { return "[线路标识无效]"; } };
   const rows = bundle.page.items.slice(0, 50).map((e) => ({
     request: e.id,
     at: new Date(e.at).toISOString(),
     source: e.source,
     account: alias(e.account),
     model: redactFeedback(e.model || ""),
+    group: publicRoute(e.group),
+    route: publicRoute(e.route),
     stage: e.stage,
     code: e.code,
     result: e.result,

@@ -8,7 +8,7 @@ import { WorkBuddySource } from "./workbuddy/source.js";
 import { OpenCodeSource } from "./opencode/source.js";
 import { WorkBuddyUpstreamClient } from "./workbuddy/vendor/upstream.js";
 import { Benefits } from "./benefits.js";
-import type { AccountRecord, AccountSnapshot } from "../shared/types.js";
+import type { AccountRecord, AccountSnapshot, RouterModel } from "../shared/types.js";
 import type { PoolMember } from "./pool.js";
 import type { RouterLogs } from "./logs.js";
 
@@ -24,6 +24,7 @@ export class Accounts {
     private readonly store: RouterStore,
     private readonly logs: RouterLogs,
     private readonly signal: AbortSignal,
+    private readonly keptModels: (region: string, catalog: RouterModel[]) => readonly string[] = () => [],
   ) {}
   private key(id: string) {
     return credentialKey(
@@ -117,8 +118,11 @@ export class Accounts {
         ? new WorkBuddySource(
             wbCredentials,
             new Benefits(this.store),
-            undefined,
+            new WorkBuddyUpstreamClient((message) => { void this.logs.append({ source: "workbuddy", account: record.id, result: "degraded", code: message === "MODEL_ROSTER_MISSING" ? message : "MODEL_CATALOG_FALLBACK" }).catch(() => {}); }),
             record.region,
+            catalog => this.keptModels(record.region, catalog.map(m => ({ ...m, region: record.region, service: record.service }))),
+            join(this.store.directory, "accounts", record.id, "catalog.json"),
+            code => { void this.logs.append({ source: "workbuddy", account: record.id, result: "degraded", code }).catch(() => {}); },
           )
         : undefined;
     const opencode =
@@ -152,7 +156,7 @@ export class Accounts {
               upstreamId: m.id,
               id: workbuddy ? `${record.region}/${m.id}` : m.id,
               region: record.region,
-              service: record.service,
+              service: m.service || record.service,
             }));
             state.status = "ready";
             state.error = undefined;
@@ -212,6 +216,10 @@ export class Accounts {
       workbuddy,
       opencode,
       refresh,
+      syncCatalog: workbuddy ? () => {
+        const rows = workbuddy.currentCatalog();
+        if (rows.length) state.models = rows.map(m => ({ ...m, upstreamId: m.id, id: `${record.region}/${m.id}`, region: record.region, service: record.service }));
+      } : undefined,
     });
   }
   async setKey(id: string, keyValue: string) {

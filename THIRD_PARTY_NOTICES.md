@@ -31,7 +31,7 @@
 - context-rescue 的保护范围允许异步读取宿主真实会话投影，所有压缩通过 DSH 事务并贯穿取消。
 - OpenCode 协议增加有界根 content 字段增量解码，断流仍保留已解码正文；工具参数不从部分 envelope 执行。关闭自带二次请求和 Agent 原生工具。
 - 上游实际通道拒绝直接记录，不移植系统头替换或不可见扰动逻辑。
-- 当前 vendor 文件哈希见 third-party/source-modifications-20261026.json；来源原始哈希保留在此前的 source receipts。
+- alpha.2 vendor 基线哈希见 third-party/source-modifications-20261026.json；alpha.4 修改哈希见 third-party/router-alpha4-source.json。来源原始哈希保留在此前的 source receipts。
 
 ## 原型素材
 
@@ -42,3 +42,11 @@
 Yocaihua8 在本次交付中明确确认，原 dsh-link-opencode 的 backend.js、bridge.js、protocol.js、runtime.js、catalog.js 可按 MIT 随新插件公开并保留来源。对应许可文本见 third-party/opencode-MIT.txt。此为本次授权补充，不声称固定历史提交中存在 LICENSE；原工作树未修改。
 
 正式界面修订仅汇总展示独立额度包，不修改后端分配数据；上下文使用实测目录 maxInputTokens/maxOutputTokens，不增加推测的容量。
+
+## alpha.4 成熟目录方案复用
+
+- 新增 vendor/catalog-sync.ts：从相同固定提交 src/catalog-sync.ts 抽取 LIVE_OWNED_FIELDS、overlayLiveCapabilities、mergeRoster，保留版权注释。来源哈希及当前适配哈希见 third-party/router-alpha4-source.json；scripts/vendor-catalog-sync.mjs 可复现抽取。
+- 接回已抽取的 selectCliModels、fetchModels CN v3→v2 回落和 keepIds；目录/sync 用例迁移到 test/workbuddy-roster.test.ts。失效名单、禁用与移除条目仅保留诊断。
+- Router 适配层让实时窗口、价格、可用性优先；完整目录明确删除的缓存行标记 MODEL_REMOVED。目录网络失败允许最近本机缓存，不把普通超时/通道拒绝当永久下架；401/403 拒绝缓存回落。
+- 使用 vendor/promo.ts 的 selectPromoMultiplier 按当前时间计算明确促销价，活动结束不继续标免费。账号分配继续由 Router 控制，额度耗尽不隐式转付费，不复用中途换号重试。
+- 同名分组、稳定组配置、线路绑定、费用授权和 UI 由 Router 实现，未复制原插件 UI。

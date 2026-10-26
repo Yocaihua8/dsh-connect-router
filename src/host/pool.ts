@@ -10,11 +10,13 @@ import type { RouterSource, SourceCall, CallIdentity } from "./adapter.js";
 import { configuredModel, settingsFor } from "./model-settings.js";
 import type { RouterLogs } from "./logs.js";
 import type { BindingPort } from "./bindings.js";
+import { modelGroups, groupSettings, groupCandidates, configuredGroup, routeKey, feeOrder, groupKey } from "../shared/groups.js";
 
 export interface PoolMember {
   state: AccountSnapshot;
   source: RouterSource;
   refresh(signal: AbortSignal): Promise<void>;
+  syncCatalog?(): void;
 }
 export interface Requirement {
   model: string;
@@ -42,8 +44,7 @@ export function eligible(a: AccountSnapshot, r: Requirement) {
           ["gift", "subscription"].includes(q.kind) &&
           (q.remaining ?? 0) > 0 &&
           (!q.expiresAt || q.expiresAt > Date.now()),
-      ) ||
-      r.costs.includes("paid")) &&
+      )) &&
     (!r.tools || m.tools) &&
     (!r.images || m.images) &&
     (!r.reasoning || m.reasoning) &&
@@ -56,20 +57,10 @@ export function rankAccounts(
   now = Date.now(),
 ) {
   const usable = accounts.filter((a) => eligible(a, r));
-  const expiry = (a: AccountSnapshot) =>
-    Math.min(
-      ...a.quota
-        .filter(
-          (q) =>
-            q.kind === "gift" &&
-            (q.remaining ?? 0) > 0 &&
-            q.expiresAt !== undefined &&
-            q.expiresAt > now &&
-            q.expiresAt - now <= 7 * 86400000,
-        )
-        .map((q) => q.expiresAt!),
-    );
-  return usable.sort((a, b) => {
+  return usable.sort((a, b) => compareAccounts(a,b,now));
+}
+export function compareAccounts(a: AccountSnapshot, b: AccountSnapshot, now = Date.now()) {
+  const expiry = (a: AccountSnapshot) => Math.min(...a.quota.filter(q => q.kind === "gift" && (q.remaining ?? 0) > 0 && q.expiresAt !== undefined && q.expiresAt > now && q.expiresAt - now <= 7 * 86400000).map(q => q.expiresAt!));
     const ae = expiry(a),
       be = expiry(b);
     if (ae !== be) return ae < be ? -1 : 1;
@@ -95,10 +86,9 @@ export function rankAccounts(
       if (av !== undefined && bv !== undefined && av !== bv) return bv - av;
     }
     return (a.lastUsed ?? 0) - (b.lastUsed ?? 0) || a.id.localeCompare(b.id);
-  });
 }
 export class PoolSource implements RouterSource {
-  private pins = new Map<string, { account: string; at: number }>();
+  private pins = new Map<string, { account: string; route?: string; at: number }>();
   private counter = 0;
   constructor(
     readonly sourceId: SourceId,
@@ -111,7 +101,7 @@ export class PoolSource implements RouterSource {
     const all = new Map<string, RouterModel[]>();
     for (const member of this.members())
       for (const m of member.state.models)
-        all.set(m.id, [...(all.get(m.id) || []), m]);
+        all.set(routeKey(m), [...(all.get(routeKey(m)) || []), m]);
     return [...all.values()].map((rows) => {
       const available = rows.filter((m) => !m.unavailable),
         candidates = available.length ? available : rows;
@@ -132,23 +122,35 @@ export class PoolSource implements RouterSource {
       };
     });
   }
+  groups() {
+    for (const member of this.members()) member.syncCatalog?.();
+    return modelGroups(this.members().flatMap(member => member.state.models.map(m => ({ ...m, accountId: member.state.id, accountEligible: member.state.enabled && member.state.status === "ready" }))), this.settings());
+  }
   models() {
-    return this.catalog()
-      .filter((m) => !m.unavailable && settingsFor(this.settings(), m).enabled)
+    return this.groups()
+      .filter((m) => !m.unavailable && groupSettings(m, this.settings()).enabled)
       .flatMap((m) => {
         // A changed/unknown upstream limit must not disable unrelated routes.
         try {
-          return [configuredModel(m, settingsFor(this.settings(), m))];
+          return [configuredGroup(m, groupSettings(m, this.settings()))];
         } catch {
           return [];
         }
       });
   }
+  resolve(id: string) {
+    if (id.startsWith("group:")) return this.models().find(m => m.id === id);
+    // Historic conversations retain their exact route, never resolve to a dynamic group.
+    const raw = this.catalog().find(m => m.id === id && !m.unavailable && settingsFor(this.settings(), m).enabled);
+    if (!raw || this.settings().groups?.[groupKey(raw)]?.enabled === false) return undefined;
+    return configuredModel(raw, settingsFor(this.settings(), raw));
+  }
   async prepare(id: string, signal?: AbortSignal): Promise<SourceCall> {
     signal?.throwIfAborted();
-    const model = this.models().find((m) => m.id === id);
+    const model = this.resolve(id);
     if (!model) throw new Error("MODEL_NOT_ENABLED");
-    const config = structuredClone(settingsFor(this.settings(), model));
+    const group = this.groups().find(m => m.id === id);
+    const config = structuredClone(group ? groupSettings(group, this.settings()) : settingsFor(this.settings(), model));
     const self = this;
     return {
       async *run(body, tools, signal, identity?: CallIdentity) {
@@ -185,34 +187,42 @@ export class PoolSource implements RouterSource {
             ),
           costs: config.allowedCosts ?? ["free", "credits"],
         };
-        const ranked = rankAccounts(
-          members.map((m) => m.state),
-          requirement,
-          started,
-        );
+        const maxOutput = typeof body.max_tokens === "number" ? body.max_tokens : undefined;
+        const effort = typeof body.reasoning_effort === "string" ? body.reasoning_effort : undefined;
+        for (const member of members) member.syncCatalog?.();
+        const candidates = members.flatMap(member => {
+          const routes = group ? groupCandidates({ ...group, routes: member.state.models.filter(r => groupKey(r) === id) }, config as import("../shared/types.js").GroupSettings) : member.state.models.filter(r => r.id === id);
+          return routes.filter(actual => eligible(member.state, { ...requirement, model: actual.id }) &&
+            !(config.capabilities.reasoning === false && actual.reasoning && !actual.reasoningCanDisable) &&
+            (!effort || effort === "default" || (effort === "off" ? !actual.reasoning || actual.reasoningCanDisable : actual.reasoningEfforts?.includes(effort))) &&
+            (!maxOutput || !actual.maxOutput || maxOutput <= actual.maxOutput)).map(actual => ({ account: member.state, actual, member }));
+        }).sort((a,b) => feeOrder[a.actual.cost] - feeOrder[b.actual.cost] || compareAccounts(a.account,b.account,started) ||
+          a.account.models.indexOf(a.actual)-b.account.models.indexOf(b.actual) || routeKey(a.actual).localeCompare(routeKey(b.actual)));
         if (key && self.bindings) {
           const binding = await self.bindings.assign(
             key,
             `${identity!.sessionId}:${id}:latest`,
             !!identity?.continuation,
-            ranked[0]?.id,
+            candidates[0] ? { account: candidates[0].account.id, route: routeKey(candidates[0].actual) } : undefined,
             {
               inheritLatest: identity?.purpose === "compaction",
               updateLatest: !identity?.purpose,
             },
           );
           if (binding?.pinned)
-            pinned = { account: binding.account, at: started };
+            pinned = { account: binding.account, route: binding.route, at: started };
           else if (identity?.continuation)
             throw new Error("RECOVERY_ACCOUNT_UNKNOWN");
         }
-        const chosen = pinned
-          ? ranked.find((a) => a.id === pinned.account)
-          : ranked[0];
+        if (pinned && group && !pinned.route) throw new Error("RECOVERY_ROUTE_UNKNOWN");
+        const selected = pinned
+          ? candidates.find(c => c.account.id === pinned.account && (!pinned.route || routeKey(c.actual) === pinned.route))
+          : candidates[0];
+        const chosen = selected?.account;
         if (!chosen) {
           await self.logs.append({
             source: self.sourceId,
-            model: id,
+            model: group ? undefined : id, group: group?.id, route: pinned?.route,
             kind: "request",
             result: "refused",
             code: pinned ? "PINNED_ACCOUNT_UNAVAILABLE" : "NO_ELIGIBLE_ACCOUNT",
@@ -223,12 +233,11 @@ export class PoolSource implements RouterSource {
         }
         chosen.lastUsed = started + ++self.counter / 10000;
         if (key && !self.bindings) {
-          self.pins.set(key, { account: chosen.id, at: started });
+          self.pins.set(key, { account: chosen.id, route: routeKey(selected!.actual), at: started });
           if (!self.bindings && self.pins.size > 10000)
             throw new Error("REQUEST_BINDING_LIMIT");
         }
-        const member = members.find((m) => m.state.id === chosen.id)!;
-        const actual = chosen.models.find((m) => m.id === id)!;
+        const { member, actual } = selected!;
         let result = "disconnected",
           code: string | undefined,
           httpStatus: number | undefined,
@@ -267,7 +276,7 @@ export class PoolSource implements RouterSource {
             .append({
               source: self.sourceId,
               account: chosen.id,
-              model: id,
+              model: actual.id, group: group?.id, route: routeKey(actual),
               kind: "request",
               result,
               code,
@@ -277,6 +286,7 @@ export class PoolSource implements RouterSource {
               outputTokens,
               reason: pinned
                 ? "pinned"
+                : actual.cost === "free" ? "free-first"
                 : chosen.quota.some(
                       (q) =>
                         q.kind === "gift" &&

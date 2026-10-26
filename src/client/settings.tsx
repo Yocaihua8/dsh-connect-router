@@ -25,6 +25,9 @@ import type {
 } from "../shared/types.js";
 import type { LogFilter } from "../host/logs.js";
 import { diagnostic } from "../host/diagnostics.js";
+import { isGroup, groupKey, uniqueRoutes, approvalKey, routeKey, groupCandidates, groupError } from "../shared/groups.js";
+import { settingsFor } from "../host/model-settings.js";
+import type { GroupSettings } from "../shared/types.js";
 
 type Value<K extends keyof Rpc> = Rpc[K] extends (
   ...args: any[]
@@ -62,6 +65,8 @@ const describe = (code?: string) =>
   ({
     AUTH_REQUIRED: "请完成授权",
     MODEL_DISABLED: "上游已禁用",
+    MODEL_REMOVED: "上游目录已移除",
+    NOT_IN_CURRENT_ROSTER: "不在当前模型名单",
     AUTH_EXPIRED: "授权已失效",
     AGENT_INTERFACE_NOT_INCLUDED: "独立 Agent 接口",
     AUTOMATIC_ROUTE_NOT_SUPPORTED: "自动路由不可单独发布",
@@ -178,7 +183,7 @@ function Quota({ account }: { account: AccountSnapshot }) {
         <small>总量未知或不可比较 · 图形仅表示已知余额构成</small>
       )}
       <small>
-        {account.models.filter((model) => !model.unavailable).length} 个可用模型 · 更新于 {time(account.updatedAt)}
+        {new Set(account.models.filter(m => !m.unavailable).map(groupKey)).size} 个可用模型 · {uniqueRoutes(account.models.filter(m => !m.unavailable)).length} 条线路 · 更新于 {time(account.updatedAt)}
       </small>
     </div>
   );
@@ -436,6 +441,9 @@ function ModelRow({
 }) {
   const config = client.config(model),
     mapKey = `${model.source}:${model.id}`;
+  const [showRoutes, setShowRoutes] = useState(false);
+  const routes = isGroup(model) ? uniqueRoutes(model.routes) : [];
+  const feeChoices = [...new Set((routes.length ? routes : [model]).map(r => r.cost))].filter(c => c === "paid" || c === "unknown");
   const mode =
     client.contextModes.get(mapKey) ??
     (config.context.mode === "auto"
@@ -466,7 +474,8 @@ function ModelRow({
             },
     });
   };
-  const error = contextError(model, config);
+  const candidateError = isGroup(model) && config.enabled && !model.needsReview && groupError(model, config as GroupSettings);
+  const error = contextError(model, config) || (candidateError ? "暂无线路同时满足当前账号、能力、窗口和费用设置" : "");
   return (
     <div className="cr-model">
       <div className="cr-model-main">
@@ -474,7 +483,7 @@ function ModelRow({
           type="checkbox"
           aria-label={`启用 ${model.name}`}
           checked={config.enabled}
-          disabled={!!model.unavailable || client.busy}
+          disabled={!!model.unavailable || !!(isGroup(model) && model.needsReview) || client.busy}
           onChange={(e) => client.edit(model, { enabled: e.target.checked })}
         />
         <span className="cr-model-title">
@@ -485,7 +494,9 @@ function ModelRow({
           >
             {model.name}
           </strong>
-          <span className="cr-tag">{costLabels[model.cost]}</span>
+          <span className="cr-tag">{model.cost === "free" && routes.some(r => !r.unavailable && r.cost !== "free") ? "免费优先" : costLabels[model.cost]}</span>
+          {isGroup(model) && <button className="cr-route-toggle" type="button" aria-expanded={showRoutes || !!model.needsReview}
+            aria-label={`${model.name} 的 ${routes.length} 条线路`} onClick={() => setShowRoutes(!showRoutes)}>{model.needsReview ? "待统一设置" : `${routes.length} 线路`}</button>}
         </span>
         {model.contextWindow ? (
           <div
@@ -582,11 +593,11 @@ function ModelRow({
             .map((m) => (
               <span key={m}>{m} 输出</span>
             ))}
-          {(model.cost === "paid" || model.cost === "unknown") && (
-            <label className="cr-cost-consent">
+          {feeChoices.map(cost => (
+            <label className="cr-cost-consent" key={cost}>
               <input
                 type="checkbox"
-                checked={config.allowedCosts?.includes(model.cost) ?? false}
+                checked={!!config.allowedCosts?.includes(cost) && (!isGroup(model) || routes.filter(r => r.cost === cost).every(r => (config as GroupSettings).approvedRoutes.includes(approvalKey(r))))}
                 disabled={client.busy}
                 onChange={(e) =>
                   client.edit(model, {
@@ -594,21 +605,27 @@ function ModelRow({
                       ? [
                           ...new Set([
                             ...(config.allowedCosts || ["free", "credits"]),
-                            model.cost,
+                            cost,
                           ]),
                         ]
                       : (config.allowedCosts || []).filter(
-                          (c) => c !== model.cost,
+                          (c) => c !== cost,
                         ),
                   })
                 }
               />
-              {model.cost === "paid"
-                ? "允许此模型使用付费额度"
+              {cost === "paid"
+                ? "允许当前线路使用付费额度"
                 : "允许调用费用未知的路线"}
             </label>
-          )}
+          ))}
         </div>
+        {isGroup(model) && (showRoutes || model.needsReview) && <div className="cr-route-details">
+          {model.needsReview && <div className="cr-group-review"><strong>待统一设置</strong><p>原线路设置不同，请选择一份设置或确认当前编辑。</p>
+            {routes.filter(r => settingsFor(client.snapshot!.settings[model.source], r).enabled).map(r => <Button key={routeKey(r)} variant="toolbar" onClick={() => client.confirmGroup(model, settingsFor(client.snapshot!.settings[model.source], r))}>采用 {r.upstreamId || r.id} 的设置</Button>)}
+            <Button variant="toolbar" onClick={() => client.confirmGroup(model)}>确认当前设置</Button></div>}
+          {routes.map(r => <div key={routeKey(r)} className="cr-route-item"><code>{r.upstreamId || r.id}</code><span>{costLabels[r.cost]} · {r.unavailable ? describe(r.unavailable) : groupCandidates(model, config as GroupSettings).some(c => routeKey(c) === routeKey(r)) && (config.context.mode !== "custom" || (r.contextWindow || 0) >= config.context.tokens) ? "参与自动选择" : "不符合当前设置"}</span></div>)}
+        </div>}
         {mode === "custom" && (
           <label className="cr-custom">
             自定义 tokens
@@ -1082,6 +1099,8 @@ function Logs({
                     ? "未知"
                     : `${entry.durationMs} ms`}
                 </dd>
+                <dt>模型组 / 实际线路</dt>
+                <dd>{entry.group ? (() => { try { return JSON.parse(decodeURIComponent(entry.group.slice(6))).join(" / "); } catch { return entry.group; } })() : "旧会话"}<br />{entry.model || entry.route || "—"}</dd>
                 <dt>分配原因</dt>
                 <dd>{entry.reason || "—"}</dd>
                 <dt>输入 / 输出 tokens</dt>

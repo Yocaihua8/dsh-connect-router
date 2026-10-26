@@ -25,6 +25,14 @@ const reply = (value: unknown, status = 200) =>
     status,
     headers: { "content-type": "application/json" },
   });
+test("group and route diagnostics decode before redaction and never expose account identity", () => {
+  const data = structuredClone(bundle);
+  data.page.items = [{ id: "test", at: 0, source: "workbuddy", kind: "request", result: "refused", account: "private-id", model: "cn/m", group: `group:${encodeURIComponent('["workbuddy","workbuddy","cn","a@example.com"]')}`, route: `route:${encodeURIComponent('["https://example.com/?token=secret"]')}`, reason: "free-first", stage: "response", suggestion: "" }];
+  const report = makeReport(data, "test", "synthetic");
+  assert.doesNotMatch(report.body, /a@example|example\.com|secret|private-id|%40/);
+  assert.match(report.body, /free-first/);
+  assert.match(report.body, /cn\/m/);
+});
 async function setup(
   request: typeof fetch,
   initial: unknown = {

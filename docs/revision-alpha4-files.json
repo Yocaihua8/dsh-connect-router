@@ -1,0 +1,141 @@
+{
+  "version": "0.1.0-alpha.4",
+  "files": [
+    {
+      "path": "README.md",
+      "purpose": "使用、变更、验收或回滚文档"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "purpose": "许可证来源和修改记录"
+    },
+    {
+      "path": "docs/changes.md",
+      "purpose": "使用、变更、验收或回滚文档"
+    },
+    {
+      "path": "docs/installation.md",
+      "purpose": "使用、变更、验收或回滚文档"
+    },
+    {
+      "path": "docs/release-checks.json",
+      "purpose": "使用、变更、验收或回滚文档"
+    },
+    {
+      "path": "docs/remaining.md",
+      "purpose": "使用、变更、验收或回滚文档"
+    },
+    {
+      "path": "docs/revision-alpha4-files.json",
+      "purpose": "使用、变更、验收或回滚文档"
+    },
+    {
+      "path": "docs/verification.md",
+      "purpose": "使用、变更、验收或回滚文档"
+    },
+    {
+      "path": "package-lock.json",
+      "purpose": "版本更新"
+    },
+    {
+      "path": "package.json",
+      "purpose": "版本更新"
+    },
+    {
+      "path": "scripts/vendor-catalog-sync.mjs",
+      "purpose": "固定上游模块可复现抽取"
+    },
+    {
+      "path": "src/client/controller.ts",
+      "purpose": "同名分组界面、统一设置、线路详情及日志"
+    },
+    {
+      "path": "src/client/settings.tsx",
+      "purpose": "同名分组界面、统一设置、线路详情及日志"
+    },
+    {
+      "path": "src/client/style.css",
+      "purpose": "同名分组界面、统一设置、线路详情及日志"
+    },
+    {
+      "path": "src/host/accounts.ts",
+      "purpose": "原子迁移、账号与线路绑定、发布/路由或脱敏日志"
+    },
+    {
+      "path": "src/host/adapter.ts",
+      "purpose": "原子迁移、账号与线路绑定、发布/路由或脱敏日志"
+    },
+    {
+      "path": "src/host/bindings.ts",
+      "purpose": "原子迁移、账号与线路绑定、发布/路由或脱敏日志"
+    },
+    {
+      "path": "src/host/catalog.ts",
+      "purpose": "原子迁移、账号与线路绑定、发布/路由或脱敏日志"
+    },
+    {
+      "path": "src/host/feedback.ts",
+      "purpose": "原子迁移、账号与线路绑定、发布/路由或脱敏日志"
+    },
+    {
+      "path": "src/host/logs.ts",
+      "purpose": "原子迁移、账号与线路绑定、发布/路由或脱敏日志"
+    },
+    {
+      "path": "src/host/pool.ts",
+      "purpose": "原子迁移、账号与线路绑定、发布/路由或脱敏日志"
+    },
+    {
+      "path": "src/host/service.ts",
+      "purpose": "原子迁移、账号与线路绑定、发布/路由或脱敏日志"
+    },
+    {
+      "path": "src/host/store.ts",
+      "purpose": "原子迁移、账号与线路绑定、发布/路由或脱敏日志"
+    },
+    {
+      "path": "src/host/workbuddy/source.ts",
+      "purpose": "复用上游目录/同步、历史选择、缓存及费用判定"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/catalog-sync.ts",
+      "purpose": "复用上游目录/同步、历史选择、缓存及费用判定"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/upstream.ts",
+      "purpose": "复用上游目录/同步、历史选择、缓存及费用判定"
+    },
+    {
+      "path": "src/shared/feedback.ts",
+      "purpose": "分组规则/数据结构或版本标识"
+    },
+    {
+      "path": "src/shared/groups.ts",
+      "purpose": "分组规则/数据结构或版本标识"
+    },
+    {
+      "path": "src/shared/types.ts",
+      "purpose": "分组规则/数据结构或版本标识"
+    },
+    {
+      "path": "test/feedback.test.ts",
+      "purpose": "相关回归测试"
+    },
+    {
+      "path": "test/groups.test.ts",
+      "purpose": "相关回归测试"
+    },
+    {
+      "path": "test/pool-settings-logs.test.ts",
+      "purpose": "相关回归测试"
+    },
+    {
+      "path": "test/workbuddy-roster.test.ts",
+      "purpose": "相关回归测试"
+    },
+    {
+      "path": "third-party/router-alpha4-source.json",
+      "purpose": "许可证来源和修改记录"
+    }
+  ]
+}

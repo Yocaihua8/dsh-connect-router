@@ -1,3 +1,4 @@
+import { groupKey } from "../src/shared/groups.js";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
@@ -417,7 +418,7 @@ test("一个模型上限失效不阻塞其他目录，推理能力按分配账�
   const a = account("a");
   a.models = [
     { ...model, contextWindow: undefined },
-    { ...model, id: "cn/other", reasoning: false },
+    { ...model, id: "cn/other", upstreamId: "other", name: "Other", reasoning: false },
   ];
   const pool = new PoolSource(
     "workbuddy",
@@ -442,7 +443,7 @@ test("一个模型上限失效不阻塞其他目录，推理能力按分配账�
   );
   assert.deepEqual(
     pool.models().map((m) => m.id),
-    ["cn/other"],
+    [groupKey(a.models[1]!)],
   );
   assert.equal(
     rankAccounts([a], { ...requirement, model: "cn/other", reasoning: true })

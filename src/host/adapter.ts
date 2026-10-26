@@ -34,6 +34,7 @@ export interface SourceCall {
 }
 export interface RouterSource {
   models(): readonly RouterModel[];
+  resolve?(id: string): RouterModel | undefined;
   prepare(model: string, signal?: AbortSignal): Promise<SourceCall>;
 }
 export const ROUTES = {
@@ -72,7 +73,7 @@ export class RouterAdapter extends LlmAdapter {
     );
   }
   private metadata(provider: string, id: string): LlmResolvedModelInfo {
-    const m = this.source.models().find((m) => m.id === id);
+    const m = this.source.resolve?.(id) ?? this.source.models().find((m) => m.id === id);
     if (!m) throw new Error("MODEL_NOT_ENABLED");
     const budget = this.budget(id),
       window =
@@ -131,7 +132,7 @@ export class RouterAdapter extends LlmAdapter {
     const model = this.metadata(provider, id),
       call = await this.source.prepare(id, signal);
     const capabilities = structuredClone(
-      this.source.models().find((m) => m.id === id)!,
+      (this.source.resolve?.(id) ?? this.source.models().find((m) => m.id === id))!,
     );
     return {
       model,

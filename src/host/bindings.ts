@@ -7,9 +7,9 @@ export interface BindingPort {
     key: string,
     latest: string,
     resume: boolean,
-    preferred?: string,
+    preferred?: string | { account: string; route: string },
     options?: { inheritLatest?: boolean; updateLatest?: boolean },
-  ): Promise<{ account: string; pinned: boolean } | undefined>;
+  ): Promise<{ account: string; route?: string; pinned: boolean } | undefined>;
 }
 /** Durable request affinity; contains hashes and account IDs, never message content. */
 export class RequestBindings implements BindingPort {
@@ -21,13 +21,13 @@ export class RequestBindings implements BindingPort {
     key: string,
     latest: string,
     resume: boolean,
-    preferred?: string,
+    preferred?: string | { account: string; route: string },
     options?: { inheritLatest?: boolean; updateLatest?: boolean },
   ) {
     const hash = (text: string) =>
       createHash("sha256").update(text).digest("hex");
     return withFileLock(this.path, async () => {
-      let rows: Record<string, string> = {};
+      let rows: Record<string, string | { account: string; route: string }> = {};
       try {
         rows = JSON.parse(await readFile(this.path, "utf8"));
       } catch (e) {
@@ -40,8 +40,8 @@ export class RequestBindings implements BindingPort {
         Object.entries(rows).some(
           ([k, v]) =>
             !/^[a-f0-9]{64}$/.test(k) ||
-            typeof v !== "string" ||
-            !/^[\w-]{1,100}$/.test(v),
+            (typeof v === "string" ? !/^[\w-]{1,100}$/.test(v) :
+              !v || typeof v !== "object" || !/^[\w-]{1,100}$/.test(v.account) || typeof v.route !== "string" || !v.route.startsWith("route:") || v.route.length > 4096),
         )
       )
         throw new Error("INVALID_REQUEST_BINDINGS");
@@ -60,7 +60,7 @@ export class RequestBindings implements BindingPort {
         mode: 0o600,
         dirMode: 0o700,
       });
-      return { account, pinned: !!existing };
+      return typeof account === "string" ? { account, pinned: !!existing } : { ...account, pinned: !!existing };
     });
   }
 }

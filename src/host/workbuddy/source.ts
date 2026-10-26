@@ -1,4 +1,9 @@
 import { createHash } from "node:crypto";
+import { readFile, mkdir } from "node:fs/promises";
+import { dirname } from "node:path";
+import { writeFileAtomic } from "@deepseek-ai/dsh-atomic-write";
+import { mergeRoster } from "./vendor/catalog-sync.js";
+import type { WorkBuddyUpstreamModel } from "./vendor/upstream.js";
 import { WorkBuddyUpstreamClient, regionOf } from "./vendor/upstream.js";
 import { oauthStart, oauthPoll, oauthCancel } from "./vendor/oauth.js";
 import { WorkBuddyCredentials } from "./credentials.js";
@@ -10,23 +15,58 @@ import type { RouterSource, SourceCall } from "../adapter.js";
 export class WorkBuddySource implements RouterSource {
   private catalog: RouterModel[] = [];
   private selected: string[] = [];
+  private savedCatalog: readonly WorkBuddyUpstreamModel[] = [];
   constructor(
     readonly credentials: WorkBuddyCredentials,
     readonly benefits: Benefits,
     readonly upstream = new WorkBuddyUpstreamClient(),
     readonly region: "cn" | "global" = "cn",
+    private readonly keepModelIds: (catalog: RouterModel[]) => readonly string[] = () => [],
+    private readonly cacheFile?: string,
+    private readonly degraded: (code: string) => void = () => {},
   ) {}
   models() {
     return this.catalog.filter((m) => this.selected.includes(m.id));
   }
+  currentCatalog() { return this.savedCatalog.map(workbuddyModel); }
   select(ids: readonly string[]) {
     this.selected = [...ids];
   }
   async refresh(signal: AbortSignal) {
     const c = await this.credentials.resolve(signal);
-    this.catalog = (await this.upstream.fetchModels(c, signal)).map(
-      workbuddyModel,
-    );
+    if (!this.savedCatalog.length && this.cacheFile) {
+      try {
+        const text = await readFile(this.cacheFile, "utf8");
+        if (text.length > 4 * 1024 * 1024) throw new Error("INVALID_CATALOG_CACHE");
+        const rows = JSON.parse(text);
+        if (!Array.isArray(rows) || rows.length > 4096 || rows.some(r => !r || typeof r.id !== "string" || typeof r.name !== "string")) throw new Error("INVALID_CATALOG_CACHE");
+        this.savedCatalog = rows;
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code !== "ENOENT") this.degraded("CATALOG_CACHE_INVALID");
+      }
+    }
+    let live: readonly WorkBuddyUpstreamModel[];
+    try {
+      const selected = await this.upstream.fetchModels(c, signal, this.keepModelIds(this.savedCatalog.map(workbuddyModel)));
+      live = this.upstream.lastCatalog.length ? this.upstream.lastCatalog : selected;
+    } catch (e) {
+      signal.throwIfAborted();
+      if ((e as { status?: number }).status === 401 || (e as { status?: number }).status === 403) throw new Error("AUTH_EXPIRED");
+      if (!this.savedCatalog.length) throw e;
+      this.degraded("MODEL_CATALOG_CACHED");
+      this.catalog = this.savedCatalog.map(workbuddyModel);
+      return this.catalog;
+    }
+    // Reuse upstream order/selection repair. Live limits, prices and availability
+    // remain authoritative; an entry missing from the complete live directory is removed.
+    const byId = new Map(live.map(m => [m.id, m]));
+    const repaired = mergeRoster(this.savedCatalog, live).map(m => byId.get(m.id) || { ...m, unavailable: "MODEL_REMOVED" });
+    if (this.cacheFile && JSON.stringify(repaired) !== JSON.stringify(this.savedCatalog)) {
+      await mkdir(dirname(this.cacheFile), { recursive: true });
+      await writeFileAtomic(this.cacheFile, JSON.stringify(repaired), { mode: 0o600, dirMode: 0o700 }).catch(() => this.degraded("CATALOG_CACHE_WRITE_FAILED"));
+    }
+    this.savedCatalog = repaired;
+    this.catalog = repaired.map(workbuddyModel);
     return this.catalog;
   }
   async prepare(id: string, signal?: AbortSignal): Promise<SourceCall> {

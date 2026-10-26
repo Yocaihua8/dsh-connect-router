@@ -12,6 +12,7 @@ const safeId = (v: unknown) =>
     : undefined;
 const safeNumber = (v: unknown) =>
   typeof v === "number" && Number.isFinite(v) && v >= 0 ? v : undefined;
+const safeRoute = (v: unknown) => typeof v === "string" && /^(group|route):[A-Za-z0-9%_.!~*'()-]{1,4000}$/u.test(v) ? v : undefined;
 /** Allowlist at the persistence boundary: extra payloads, bodies and URLs never enter the file. */
 export function sanitizeLog(
   raw: Partial<LogEntry>,
@@ -24,6 +25,8 @@ export function sanitizeLog(
     source: raw.source === "opencode" ? "opencode" : "workbuddy",
     account: safeId(raw.account),
     model: safeId(raw.model),
+    group: safeRoute(raw.group),
+    route: safeRoute(raw.route),
     result: safeId(raw.result) || "unknown",
     code: safeId(raw.code),
     reason: [
@@ -31,6 +34,7 @@ export function sanitizeLog(
       "available-quota",
       "least-recent",
       "pinned",
+      "free-first",
     ].includes(raw.reason || "")
       ? raw.reason
       : undefined,
@@ -86,7 +90,7 @@ export class RouterLogs {
         (r) =>
           (!filter.source || r.source === filter.source) &&
           (!filter.account || r.account === filter.account) &&
-          (!filter.model || r.model === filter.model) &&
+          (!filter.model || r.model === filter.model || r.group === filter.model) &&
           (!filter.result || r.result === filter.result) &&
           (!filter.kind || r.kind === filter.kind) &&
           (filter.before === undefined || r.at < filter.before),

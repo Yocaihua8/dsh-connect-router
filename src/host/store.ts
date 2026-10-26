@@ -240,6 +240,22 @@ export function validateSettings(value: unknown): RouterSettings {
       }
       result[source].models = models;
     }
+    if (s.groups !== undefined) {
+      if (!s.groups || typeof s.groups !== "object" || Array.isArray(s.groups) || Object.keys(s.groups).length > 2048)
+        throw new Error("INVALID_GROUP_SETTINGS");
+      const entries = Object.entries(s.groups);
+      const normalized = validateSettings({ ...structuredClone(DEFAULT_SETTINGS), [source]: {
+        enabledModels: [], autoCheckin: s.autoCheckin,
+        models: Object.fromEntries(entries.map(([,v], i) => [`g${i}`, v])),
+      } })[source].models!;
+      result[source].groups = Object.fromEntries(entries.map(([id, value], i) => {
+        const g = value as any;
+        if (!id.startsWith("group:") || id.length > 4096 || !Array.isArray(g.approvedRoutes) || g.approvedRoutes.length > 2048 ||
+          g.approvedRoutes.some((r: unknown) => typeof r !== "string" || !r.startsWith("route:") || r.length > 4096) ||
+          g.needsReview !== undefined && typeof g.needsReview !== "boolean") throw new Error("INVALID_GROUP_SETTINGS");
+        return [id, { ...normalized[`g${i}`]!, approvedRoutes: [...new Set<string>(g.approvedRoutes)], ...(g.needsReview ? { needsReview: true } : {}) }];
+      }));
+    }
   }
   return result;
 }

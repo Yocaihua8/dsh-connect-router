@@ -1,122 +1,46 @@
 {
   "date": "2026-10-26",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "dsh": "0.2.1-rc.3",
   "commands": [
     {
       "command": "npm run check",
       "status": "passed",
-      "tests": 71,
+      "tests": 89,
       "typecheckProjects": 3,
-      "build": "host/client/declarations/typert"
+      "build": "host/client/typert/declarations"
     },
     {
       "command": "npm run check:package",
-      "status": "passed"
-    },
-    {
-      "command": "prototype: npm test",
       "status": "passed",
-      "tests": 5,
-      "scope": "alpha.2 historical; not rerun for alpha.3"
-    },
-    {
-      "command": "prototype: npm run test:sites",
-      "status": "passed",
-      "tests": 4,
-      "scope": "alpha.2 historical; not rerun for alpha.3"
-    },
-    {
-      "command": "prototype: npm run build",
-      "status": "passed",
-      "warning": "native shell bundle exceeds 500kB",
-      "scope": "alpha.2 historical; not rerun for alpha.3"
-    },
-    {
-      "command": "npm audit --json",
-      "status": "failed",
-      "affectedHighDependencyNodes": 39,
-      "advisory": "GHSA-mrhx-c7xc-m3w5",
-      "scope": "alpha.2 historical; not rerun for alpha.3"
-    },
-    {
-      "command": "npm run build",
-      "status": "passed",
-      "scope": "final CSS line-height adjustment"
-    },
-    {
-      "command": "official dsh plugin --profile desktop add <alpha.3.tgz> --ignore-scripts",
-      "status": "passed",
-      "exitCode": 0
+      "files": 72
     }
   ],
   "actual": {
-    "workbuddyAuthorization": "passed",
-    "workbuddyCatalog": "61 total; 55 available shown",
-    "workbuddyCheckin": "confirmed",
-    "workbuddyActivities": "already claimed; none eligible",
-    "workbuddyChat": "HTTP 400 UPSTREAM_CHANNEL_REJECT",
-    "opencodeCatalog": "daily startup: 9 available public models",
-    "opencodeChat": "UPSTREAM_REJECTED",
+    "workbuddyCatalog": {
+      "raw": 61,
+      "availableRoutes": 18,
+      "groups": 17
+    },
+    "workbuddyChat": "HTTP 400 UPSTREAM_CHANNEL_REJECT; cn/hy3, free-first",
+    "opencodeChat": "UPSTREAM_REJECTED; opencode/big-pickle",
+    "ui": "540x604 dark/light and 1280x800; collapsed 79/69 CSS px; no page overflow; draft/save/undo and route expansion passed",
+    "dailyInstall": "official CLI passed; actual Electron settings, grouped models and route detail loaded; final archive receipt is stored locally",
+    "dailyIntegrity": {
+      "otherPlugins": 14,
+      "otherFilesCompared": 2082,
+      "mismatches": 0,
+      "credentialsUnchanged": true,
+      "accountsUnchanged": true,
+      "legacySettingsUnchanged": true,
+      "hostAndCordisUnchanged": true
+    },
     "nativeTools": "not passed",
     "nativeMedia": "not passed",
-    "dailyInstall": "passed: backup and official CLI upgrade",
-    "electron": "passed: native settings, account and compact model rows",
-    "githubFeedback": {
-      "authorization": "passed-device-flow",
-      "creation": "passed-plugin-direct",
-      "issue": "https://github.com/Yocaihua8/dsh-connect-router/issues/1",
-      "viaApp": "yocaihua8-connect-router-feedback",
-      "realLogCount": 0,
-      "state": "closed",
-      "reason": "completed",
-      "closedAt": "2026-10-26T17:29:46+08:00",
-      "screenshot": "unavailable; DOM and GitHub API verified"
-    },
-    "integrity": {
-      "otherPlugins": 14,
-      "otherFiles": 2082,
-      "changedOtherFiles": 0,
-      "credentialsUnchanged": true,
-      "routerSettingsUnchanged": true,
-      "routerAccountsUnchanged": true,
-      "cordisUnchanged": true,
-      "hostUnchanged": true
-    }
-  },
-  "ui": {
-    "viewports": [
-      "540x604",
-      "1280x800"
-    ],
-    "themes": [
-      "dark",
-      "light"
-    ],
-    "draft": "passed",
-    "contextValidation": "passed",
-    "menus": "passed",
-    "logFilters": "passed",
-    "redactedDownload": "passed",
-    "mockDataInProduction": false,
-    "console": {
-      "interactions": "no warnings/errors",
-      "lastRestart": "DSH locale uiConversation.binding unknown session during initialization; settings usable"
-    },
-    "compactRevision": {
-      "normalTwoLineHeightCSSpx": 79,
-      "removedQuotaDetails": true,
-      "unavailableModelsHidden": true,
-      "repeatedWindowCopyRemoved": true,
-      "pageHorizontalOverflow": false,
-      "contextOnlyScroll": true,
-      "keyboard": true,
-      "costConsentIndependent": true,
-      "draftRestored": true,
-      "themesRestored": true,
-      "saveFailure": "covered by existing controller test; no real storage failure injected",
-      "screenshots": "local output/router-alpha3-20261026/evidence"
-    }
-  },
-  "releaseStatus": "alpha.3-daily-ui-accepted-upstream-chat-still-blocked"
+    "realMultiAccountRouting": "not passed; controlled tests only",
+    "credentialsCopiedFromIsolation": false,
+    "actualLogsUploaded": false,
+    "githubFeedback": "historical alpha.2 synthetic Issue #1; not resent",
+    "rollback": "alpha.3 retained; downgrade not executed"
+  }
 }

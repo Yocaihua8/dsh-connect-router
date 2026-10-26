@@ -7,8 +7,10 @@ import type {
   RouterSettings,
   ModelSettings,
   SourceId,
+  GroupSettings, ModelGroup,
 } from "../shared/types.js";
 import { sameModelSettings, settingsFor } from "../host/model-settings.js";
+import { isGroup, groupSettings, modelGroups, groupError, sameGroupSettings, approvalKey } from "../shared/groups.js";
 
 export type Rpc = Context["remote"]["connectRouter"];
 export function unwrap<T>(
@@ -84,13 +86,17 @@ export class RouterClient {
     );
   }
   config(model: RouterModel) {
-    return settingsFor(this.draft![model.source], model);
+    return isGroup(model) ? groupSettings(model, this.draft![model.source]) : settingsFor(this.draft![model.source], model);
+  }
+  allModels(source: SourceId) {
+    const groups = this.snapshot?.groups?.[source];
+    return groups ? modelGroups(groups.flatMap(g => g.routes), this.draft![source]) : this.snapshot?.models[source] ?? [];
   }
   models(search = "", capability = "all", enabledOnly = false) {
-    return (this.snapshot?.models[this.source] ?? []).filter(
+    return this.allModels(this.source).filter(
       (m) =>
         !m.unavailable &&
-        `${m.name} ${m.id}`.toLowerCase().includes(search.toLowerCase()) &&
+        `${m.name} ${m.id} ${isGroup(m) ? m.routes.map(r => r.id).join(" ") : ""}`.toLowerCase().includes(search.toLowerCase()) &&
         (!enabledOnly || this.config(m).enabled) &&
         (capability === "all" || m[capability as "tools" | "images" | "reasoning"]),
     );
@@ -98,15 +104,39 @@ export class RouterClient {
   edit(model: RouterModel, change: Partial<ModelSettings>) {
     if (!this.draft) return;
     const source = this.draft[model.source];
+    if (isGroup(model)) {
+      source.groups ??= {};
+      const before = groupSettings(model, source), after = { ...before, ...change };
+      if (change.allowedCosts) after.approvedRoutes = [...new Set([
+        ...before.approvedRoutes.filter(k => !model.routes.some(r => approvalKey(r) === k && !change.allowedCosts!.includes(r.cost))),
+        ...model.routes.filter(r => ["paid", "unknown"].includes(r.cost) && change.allowedCosts!.includes(r.cost)).map(approvalKey),
+      ])];
+      source.groups[model.id] = after;
+      this.message = ""; this.changed(); return;
+    }
     source.models ??= {};
     source.models[model.id] = { ...this.config(model), ...change };
     this.message = "";
     this.changed();
   }
+  confirmGroup(model: ModelGroup, value?: ModelSettings) {
+    const source = this.draft![model.source]; source.groups ??= {};
+    source.groups[model.id] = { ...groupSettings(model, source), ...value, needsReview: false };
+    this.message = ""; this.changed();
+  }
   validation() {
     if (!this.snapshot || !this.draft) return "";
     for (const source of ["workbuddy", "opencode"] as const)
-      for (const model of this.snapshot.models[source]) {
+      for (const model of this.allModels(source)) {
+        if (isGroup(model)) {
+          const next = groupSettings(model, this.draft[source]), old = groupSettings(model, this.snapshot.settings[source]);
+          if (sameGroupSettings(old,next)) continue;
+          if (model.unavailable) return `${model.name}：模型暂不可用，未保存修改已保留，请撤销后再保存。`;
+          const error = groupError(model,next);
+          if (error && (next.enabled || next.needsReview || error === "CONTEXT_LIMIT_UNCONFIRMED"))
+            return `${model.name}：${error === "GROUP_SETTINGS_REVIEW_REQUIRED" ? "请先确认统一设置" : error === "CONTEXT_LIMIT_UNCONFIRMED" ? "没有线路支持此上下文长度" : "没有线路同时满足能力和费用设置"}`;
+          continue;
+        }
         if (model.unavailable) {
           if (!sameModelSettings(
             settingsFor(this.snapshot.settings[source], model),

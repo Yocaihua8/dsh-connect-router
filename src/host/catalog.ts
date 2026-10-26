@@ -1,4 +1,5 @@
 import type { RouterModel, SourceId } from "../shared/types.js";
+import { selectPromoMultiplier, type WorkBuddyPromo } from "./workbuddy/vendor/promo.js";
 const number = (v: unknown): number | undefined =>
   typeof v === "number" && Number.isFinite(v) && v >= 0 ? v : undefined;
 const limit = (v: unknown): number | undefined => {
@@ -9,6 +10,7 @@ export function workbuddyModel(raw: {
   id: string;
   name?: string;
   creditMultiplier?: number;
+  promos?: readonly WorkBuddyPromo[];
   contextWindow?: number;
   maxTokens?: number;
   supportsToolCall?: boolean;
@@ -19,7 +21,7 @@ export function workbuddyModel(raw: {
   };
   unavailable?: string;
 }): RouterModel {
-  const price = number(raw.creditMultiplier);
+  const price = number(selectPromoMultiplier(raw.promos, Date.now()) ?? raw.creditMultiplier);
   return {
     id: raw.id,
     source: "workbuddy",

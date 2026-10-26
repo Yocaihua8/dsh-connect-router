@@ -1722,6 +1722,18 @@ export class WorkBuddyUpstreamClient {
      * never withdraws a model the user is running (issue #32's failure mode,
      * one step upstream of it).
      */
+    /** Full records are diagnostic-only. The executable roster follows upstream selectCliModels. */
+    lastCatalog: readonly WorkBuddyUpstreamModel[] = [];
+    private catalogFrom(data: Record<string, unknown>, keepModelIds: readonly string[]) {
+        const full = withPromos((Array.isArray(data['models']) ? data['models'] : []).map(parseUpstreamModel).filter((m): m is WorkBuddyUpstreamModel => !!m), data);
+        const selected = withPromos(selectCliModels(data['models'], data['agents'], keepModelIds), data);
+        const ids = new Set(selected.map(m => m.id));
+        // Preserve official roster order. Non-roster records remain available to diagnosis only.
+        this.lastCatalog = [...selected, ...full.filter(m => !ids.has(m.id)).map(m => ({ ...m, unavailable: m.unavailable || 'NOT_IN_CURRENT_ROSTER' }))];
+        if (!(Array.isArray(data['agents']) && data['agents'].some((a: any) => a?.name === 'cli' && Array.isArray(a.models) && a.models.length)))
+            this.onFallback?.('MODEL_ROSTER_MISSING');
+        return selected;
+    }
     async fetchModels(credential: WorkBuddyCredential, signal?: AbortSignal, keepModelIds: readonly string[] = []): Promise<readonly WorkBuddyUpstreamModel[]> {
         const timeout = AbortSignal.any([...(signal ? [signal] : []), AbortSignal.timeout(JSON_TIMEOUT_MS)]);
         const global = regionOf(credential.domain) === 'global';
@@ -1745,7 +1757,7 @@ export class WorkBuddyUpstreamClient {
             const data = typeof envelope.data === 'object' && envelope.data !== null
                 ? envelope.data as Record<string, unknown>
                 : {};
-            return withPromos((Array.isArray(data['models']) ? data['models'] : []).map(parseUpstreamModel).filter((m): m is WorkBuddyUpstreamModel => !!m), data);
+            return this.catalogFrom(data, keepModelIds);
         }
         const readCatalog = async (path: string): Promise<readonly WorkBuddyUpstreamModel[]> => {
             const response = await fetch(`${chatBase(credential)}${path}`, {
@@ -1764,7 +1776,7 @@ export class WorkBuddyUpstreamClient {
             const data = typeof envelope.data === 'object' && envelope.data !== null
                 ? envelope.data as Record<string, unknown>
                 : {};
-            return withPromos((Array.isArray(data['models']) ? data['models'] : []).map(parseUpstreamModel).filter((m): m is WorkBuddyUpstreamModel => !!m), data);
+            return this.catalogFrom(data, keepModelIds);
         };
         try {
             return await readCatalog(GLOBAL_CONFIG_PATH);

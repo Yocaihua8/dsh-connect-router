@@ -1,0 +1,20 @@
+{
+  "version": "0.1.0-alpha.4",
+  "upstreamCommit": "3b558326a962aa2cfa57ff558b452f7635b447ac",
+  "originalCatalogSyncSha256": "090c3a07ac0a94693527fad122dcee5de1f2005487d60c2d1450756446f2745a",
+  "adapted": [
+    {
+      "path": "src/host/workbuddy/vendor/upstream.ts",
+      "sha256": "f0a9ddfbfc1a10be6bd17a051173015f2cf7945ea2167996e6174106166f3cfc"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/catalog-sync.ts",
+      "sha256": "c881d4e1a6947a9ed8523c89077857f522edc3fa0fbb6e807ecba2a0492e3263"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/promo.ts",
+      "sha256": "ba11e33ead5bd1fae8285fda54f8230d13ad1276b364e34acd334a78574aa751"
+    }
+  ],
+  "testAdaptation": "test/workbuddy-roster.test.ts"
+}

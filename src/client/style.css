@@ -256,6 +256,25 @@
 .dsh-connect-router .cr-model p {
   margin: 4px 0 0;
 }
+.dsh-connect-router .cr-route-toggle {
+  flex: none;
+  font: inherit;
+  font-size: 11px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  color: var(--cr-muted);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dsh-connect-router .cr-route-toggle:hover,
+.dsh-connect-router .cr-route-toggle[aria-expanded="true"] { background: var(--cr-border); }
+.dsh-connect-router .cr-route-details { margin-top: 6px; padding: 8px; border: 1px solid var(--cr-border); border-radius: 6px; font-size: 11px; }
+.dsh-connect-router .cr-route-item { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 3px 0; }
+.dsh-connect-router .cr-route-item code { overflow-wrap: anywhere; min-width: 0; }
+.dsh-connect-router .cr-route-item span { color: var(--cr-muted); }
+.dsh-connect-router .cr-group-review { margin-bottom: 8px; }
 .dsh-connect-router .cr-custom {
   display: flex;
   gap: 10px;

@@ -26,6 +26,17 @@ export interface RouterModel {
   output?: readonly string[];
   reasoningCanDisable?: boolean;
   reasoningEfforts?: readonly string[];
+  accountId?: string;
+  accountEligible?: boolean;
+}
+export interface GroupSettings extends ModelSettings {
+  /** Explicit fee approvals are bound to existing routes, never new paid routes. */
+  approvedRoutes: string[];
+  needsReview?: boolean;
+}
+export interface ModelGroup extends RouterModel {
+  routes: RouterModel[];
+  needsReview?: boolean;
 }
 export type Capability = "tools" | "images" | "reasoning";
 export interface ModelSettings {
@@ -62,6 +73,7 @@ export interface SourceSettings {
   contextBudget?: number;
   autoCheckin: boolean;
   models?: Record<string, ModelSettings>;
+  groups?: Record<string, GroupSettings>;
 }
 export interface RouterSettings {
   workbuddy: SourceSettings;
@@ -89,6 +101,7 @@ export interface RouterSnapshot {
   settings: RouterSettings;
   accounts: AccountSnapshot[];
   models: Record<SourceId, RouterModel[]>;
+  groups?: Record<SourceId, ModelGroup[]>;
 }
 export interface LoginStart {
   loginId: string;
@@ -127,9 +140,11 @@ export interface LogEntry {
   source: SourceId;
   account?: string;
   model?: string;
+  group?: string;
+  route?: string;
   result: string;
   code?: string;
-  reason?: "expiring-gift" | "available-quota" | "least-recent" | "pinned";
+  reason?: "expiring-gift" | "available-quota" | "least-recent" | "pinned" | "free-first";
   durationMs?: number;
   inputTokens?: number;
   outputTokens?: number;

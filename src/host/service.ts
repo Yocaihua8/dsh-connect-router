@@ -11,7 +11,8 @@ import { RouterAdapter, ROUTES } from "./adapter.js";
 import { Accounts } from "./accounts.js";
 import { PoolSource } from "./pool.js";
 import { RouterLogs, type LogFilter, type LogEntry } from "./logs.js";
-import { validateModelChange, settingsFor } from "./model-settings.js";
+import { validateModelChange, settingsFor, sameModelSettings } from "./model-settings.js";
+import { groupSettings, groupKey, groupError, sameGroupSettings, approvalKey, retainedWorkBuddyIds } from "../shared/groups.js";
 import { diagnostic } from "./diagnostics.js";
 import { RequestBindings } from "./bindings.js";
 import { ContextRecovery } from "./recovery.js";
@@ -85,7 +86,9 @@ export default class ConnectRouter extends TypertRemoteService {
       },
       remove: () => ctx.credentials.deleteRecord(feedbackKey),
     });
-    this.accounts = new Accounts(ctx, this.store, this.logs, this.abort.signal);
+    this.accounts = new Accounts(ctx, this.store, this.logs, this.abort.signal, (region, cached) => {
+      return retainedWorkBuddyIds(this.settings.workbuddy, region, [...cached, ...[...this.accounts.members.values()].flatMap(m => m.state.models)]);
+    });
     const recovery = new ContextRecovery(ctx, this.logs, this.abort.signal);
     this.pools = Object.fromEntries(
       (["workbuddy", "opencode"] as const).map((id) => [
@@ -113,7 +116,7 @@ export default class ConnectRouter extends TypertRemoteService {
             recovery.observe(
               options,
               result,
-              this.pools[id].models().find((m) => m.id === options.model)
+              this.pools[id].resolve(options.model)
                 ?.contextWindow,
             );
             if (options.sessionId && !options.purpose) {
@@ -161,15 +164,28 @@ export default class ConnectRouter extends TypertRemoteService {
     this.settings = await this.store.readSettings();
     this.diagnostics = new Map(await this.store.readRecoveries());
     await this.accounts.initialize();
+    const refreshes: Promise<unknown>[] = [];
     for (const m of this.accounts.members.values()) {
       if (m.state.enabled)
-        void m
+        refreshes.push(m
           .refresh(this.abort.signal)
           .then(() => this.ctx.emit("llm/adapters-updated"))
-          .catch(() => {});
+          .catch(() => {}));
       if (m.workbuddy && this.settings.workbuddy.autoCheckin)
         void this.startupCheckin(m.state.id);
     }
+    await Promise.all(refreshes);
+    const migrated = structuredClone(this.settings);
+    for (const id of ["workbuddy", "opencode"] as const) for (const group of this.pools[id].groups()) {
+      migrated[id].groups ??= {};
+      if (!migrated[id].groups![group.id]) {
+        const inherited = groupSettings(group, this.settings[id]);
+        migrated[id].groups![group.id] = inherited.enabled && groupError(group, inherited)
+          ? { ...inherited, needsReview: true } : inherited;
+      }
+    }
+    if (JSON.stringify(migrated) !== JSON.stringify(this.settings)) this.settings = await this.store.saveSettings(migrated);
+    this.ctx.emit("llm/adapters-updated");
   }
   private async startupCheckin(id: string) {
     try {
@@ -223,6 +239,7 @@ export default class ConnectRouter extends TypertRemoteService {
         workbuddy: this.pools.workbuddy.catalog(),
         opencode: this.pools.opencode.catalog(),
       },
+      groups: { workbuddy: this.pools.workbuddy.groups(), opencode: this.pools.opencode.groups() },
     }));
   }
   @Remote async saveSettings(
@@ -232,12 +249,27 @@ export default class ConnectRouter extends TypertRemoteService {
     return this.guarded(signal, async () => {
       const next = validateSettings(settings);
       for (const id of ["workbuddy", "opencode"] as const)
-        for (const m of this.pools[id].catalog())
+        for (const m of this.pools[id].catalog()) {
+          if (next[id].groups?.[groupKey(m)] && sameModelSettings(settingsFor(this.settings[id], m), settingsFor(next[id], m))) continue;
           validateModelChange(
             m,
             settingsFor(this.settings[id], m),
             settingsFor(next[id], m),
           );
+        }
+      for (const id of ["workbuddy", "opencode"] as const) {
+        const groups = this.pools[id].groups?.() || [];
+        for (const [key, config] of Object.entries(next[id].groups || {})) {
+          const group = groups.find(g => g.id === key);
+          const previous = group ? groupSettings(group, this.settings[id]) : this.settings[id].groups?.[key];
+          if (previous && sameGroupSettings(previous, config)) continue;
+          if (!group || group.unavailable) throw new Error("UNAVAILABLE_MODEL_CHANGED");
+          if (config.approvedRoutes.some(r => !previous?.approvedRoutes.includes(r) && !group.routes.some(m => approvalKey(m) === r))) throw new Error("INVALID_ROUTE_APPROVAL");
+          const error = groupError(group, config);
+          if (error && (config.enabled || config.needsReview)) throw new Error(error);
+          if (config.context.mode === "custom" && error === "CONTEXT_LIMIT_UNCONFIRMED") throw new Error(error);
+        }
+      }
       this.settings = await this.store.saveSettings(next);
       this.ctx.emit("llm/adapters-updated");
       return structuredClone(this.settings);
