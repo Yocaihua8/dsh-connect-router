@@ -178,8 +178,9 @@
   white-space: nowrap;
 }
 .dsh-connect-router .cr-model {
-  padding: 18px 0;
+  padding: 8px 0;
   border-bottom: 1px solid var(--cr-border);
+  min-width: 0;
 }
 .dsh-connect-router .cr-model-main {
   display: flex;
@@ -205,7 +206,7 @@
 .dsh-connect-router .cr-context label {
   position: relative;
   font-size: 11px;
-  line-height: 24px;
+  line-height: 22px;
   padding: 0 3px;
   cursor: pointer;
   border-radius: 5px;
@@ -236,29 +237,38 @@
   white-space: nowrap;
 }
 .dsh-connect-router .cr-model-detail {
-  margin: 12px 0 0 22px;
+  margin: 4px 0 0 22px;
+  min-width: 0;
 }
 .dsh-connect-router .cr-capabilities {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 4px 8px;
+  align-items: center;
   font-size: 12px;
+  line-height: 18px;
   color: var(--cr-muted);
-  margin-bottom: 8px;
+  margin: 0;
+}
+.dsh-connect-router .cr-capabilities label {
+  white-space: nowrap;
+}
+.dsh-connect-router .cr-model p {
+  margin: 4px 0 0;
 }
 .dsh-connect-router .cr-custom {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 4px;
   font-size: 12px;
 }
 .dsh-connect-router .cr-custom input {
   width: 140px;
 }
 .dsh-connect-router .cr-cost-consent {
-  display: flex;
+  display: inline-flex;
   font-size: 12px;
-  margin-top: 10px;
+  margin: 0;
 }
 .dsh-connect-router .cr-setting-row {
   border-bottom: 1px solid var(--cr-border);
@@ -485,16 +495,11 @@
   height: 7px;
   border-radius: 50%;
 }
-.dsh-connect-router .cr-quota-details summary,
 .dsh-connect-router .cr-history > summary {
   cursor: pointer;
   color: var(--cr-muted);
   font-size: 12px;
   padding: 8px 0;
-}
-.dsh-connect-router .cr-quota-package {
-  padding: 8px 0;
-  border-top: 1px solid var(--cr-border);
 }
 .dsh-connect-router .cr-history {
   margin-top: 20px;

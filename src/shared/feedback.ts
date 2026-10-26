@@ -1,7 +1,7 @@
 export const FEEDBACK_REPOSITORY = "Yocaihua8/dsh-connect-router";
 // Public application identifier, populated only after the maintainer registers the App.
 export const FEEDBACK_CLIENT_ID = "Iv23lizL3FgdbhfrtQYQ";
-export const ROUTER_VERSION = "0.1.0-alpha.2";
+export const ROUTER_VERSION = "0.1.0-alpha.3";
 export interface FeedbackAuth {
   configured: boolean;
   connected: boolean;

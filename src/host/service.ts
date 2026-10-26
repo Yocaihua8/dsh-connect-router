@@ -11,7 +11,7 @@ import { RouterAdapter, ROUTES } from "./adapter.js";
 import { Accounts } from "./accounts.js";
 import { PoolSource } from "./pool.js";
 import { RouterLogs, type LogFilter, type LogEntry } from "./logs.js";
-import { configuredModel, settingsFor } from "./model-settings.js";
+import { validateModelChange, settingsFor } from "./model-settings.js";
 import { diagnostic } from "./diagnostics.js";
 import { RequestBindings } from "./bindings.js";
 import { ContextRecovery } from "./recovery.js";
@@ -233,7 +233,11 @@ export default class ConnectRouter extends TypertRemoteService {
       const next = validateSettings(settings);
       for (const id of ["workbuddy", "opencode"] as const)
         for (const m of this.pools[id].catalog())
-          configuredModel(m, settingsFor(next[id], m));
+          validateModelChange(
+            m,
+            settingsFor(this.settings[id], m),
+            settingsFor(next[id], m),
+          );
       this.settings = await this.store.saveSettings(next);
       this.ctx.emit("llm/adapters-updated");
       return structuredClone(this.settings);

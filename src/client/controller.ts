@@ -8,7 +8,7 @@ import type {
   ModelSettings,
   SourceId,
 } from "../shared/types.js";
-import { settingsFor } from "../host/model-settings.js";
+import { sameModelSettings, settingsFor } from "../host/model-settings.js";
 
 export type Rpc = Context["remote"]["connectRouter"];
 export function unwrap<T>(
@@ -86,6 +86,15 @@ export class RouterClient {
   config(model: RouterModel) {
     return settingsFor(this.draft![model.source], model);
   }
+  models(search = "", capability = "all", enabledOnly = false) {
+    return (this.snapshot?.models[this.source] ?? []).filter(
+      (m) =>
+        !m.unavailable &&
+        `${m.name} ${m.id}`.toLowerCase().includes(search.toLowerCase()) &&
+        (!enabledOnly || this.config(m).enabled) &&
+        (capability === "all" || m[capability as "tools" | "images" | "reasoning"]),
+    );
+  }
   edit(model: RouterModel, change: Partial<ModelSettings>) {
     if (!this.draft) return;
     const source = this.draft[model.source];
@@ -98,6 +107,13 @@ export class RouterClient {
     if (!this.snapshot || !this.draft) return "";
     for (const source of ["workbuddy", "opencode"] as const)
       for (const model of this.snapshot.models[source]) {
+        if (model.unavailable) {
+          if (!sameModelSettings(
+            settingsFor(this.snapshot.settings[source], model),
+            this.config(model),
+          )) return `${model.name}：模型暂不可用，未保存修改已保留，请撤销后再保存。`;
+          continue;
+        }
         const error = contextError(model, this.config(model));
         if (error) return `${model.name}：${error}`;
       }

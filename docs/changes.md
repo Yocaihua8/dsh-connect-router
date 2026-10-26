@@ -1,6 +1,6 @@
 # 实施与文件范围
 
-独立插件位于 dsh-connect-router，原 OpenCode 工作树保留。上一阶段逐文件 SHA256 留档于 checkpoint-files.json，相应增改留档于 revision-files.json；本轮文件及哈希见 revision-alpha2-files.json。清单排除依赖、构建产物、真实 home 和清单自身。
+独立插件位于 dsh-connect-router，原 OpenCode 工作树保留。上一阶段逐文件 SHA256 留档于 checkpoint-files.json，相应增改留档于 revision-files.json、revision-alpha2-files.json；最新紧凑修订文件及哈希见 revision-alpha3-files.json。清单排除依赖、构建产物、真实 home 和清单自身。
 
 - src/client/：正式原生设置、账号池/额度、平铺上下文、能力/费用、福利、诊断、草稿、原生续写及窄屏样式；无演示目录。
 - src/host/service.ts 与 src/index.ts：owner RPC、生命周期、授权/签到/目录/日志和恢复状态。
@@ -16,7 +16,7 @@
 
 插件外改动：根 scripts/plugins.mjs 登记；output/router-ui-prototype-20261026 的已确认交互、说明与证据；Router 专用的隔离验证和交付产物。原型明确扫码、页签顺序、账号池、平铺上下文与排查日志。
 
-日常安装未执行，误构建其他插件的生成文件见 verification.md，未纳入 Router 发布。
+早期阶段未安装日常配置；后续日常替换及升级另行验收。历史误构建其他插件的生成文件见 verification.md，未纳入 Router 发布。
 
 ## 0.1.0-alpha.2
 
@@ -26,3 +26,10 @@
 - 构建与包检查从父工程抽出为插件内独立脚本；新增隐私说明、贡献说明及 Issue 模板。
 - OpenCode 五个复用模块获得作者明确 MIT 公开许可，保留原始版本、文件哈希和补充许可文本。
 - 所有代码修改及文件用途见 revision-alpha2-files.json；测试与实际验收分别记录在 verification.md。
+
+## 0.1.0-alpha.3
+
+- 删除额度明细入口及展开内容，保留额度汇总、分类、单位及未知状态；账号卡显示可用模型数。
+- 模型列表隐藏目录标记不可用的条目，删除重复的窗口/最大输出说明。两行紧凑布局保持模型、费用、上下文主行，能力和费用授权在次行。
+- 不可用且未修改的模型保留原设置并跳过当前窗口/能力校验；变为不可用前已有草稿修改时，客户端点名提示并允许撤销，后端拒绝该项修改。恢复可用后恢复校验。
+- 未改变 RPC 或存储字段；未清除账号、模型选择或费用授权。alpha.2 包保留用于回滚。

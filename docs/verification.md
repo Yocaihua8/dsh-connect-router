@@ -8,7 +8,7 @@
 
 ## 自动化
 
-本次修订 npm run check 通过：65 项测试、三个 TypeScript 工程以及完整 host/client/Typert 构建。命令及结果见 release-checks.json。
+最新 alpha.3 修订 npm run check 通过：71 项测试、三个 TypeScript 工程以及完整 host/client/Typert 构建。命令及结果见 release-checks.json；下文 alpha.2 及早期记录保留其当时边界。
 
 - npm run check：生成 host/client/Typert/声明、三个 TypeScript 工程、node:test。
 - npm run check:package：统一登记、入口、导出、声明、patch 与第三方材料检查。
@@ -26,13 +26,13 @@
 | 统一测试 | 匿名来源成功，CONNECTION_TEST，仅授权和目录 |
 | OpenCode 对话 | 15:24 Big Pickle 返回 UPSTREAM_REJECTED，未收到回答 |
 | WorkBuddy 扫码 | 用户自行微信扫码，15:25:55 授权完成并保存 DSH 凭据 |
-| WorkBuddy 目录 / 额度 | 61 项目录保留；额度按同单位汇总，原始桶仅在明细展开 |
+| WorkBuddy 目录 / 额度 | 61 项目录保留；alpha.3 界面显示 55 项可用模型，额度按同单位汇总，明细入口已删除 |
 | 自动签到 | 15:25:56 AUTO_CHECKIN confirmed；福利页已签到 |
 | 福利活动 | 两项活动均已领取，暂无可领取活动，未重复领取 |
 | WorkBuddy 对话 | 15:28 Hy3（cn/hy3，32K）HTTP 400 / UPSTREAM_CHANNEL_REJECT，约 283ms |
 | 工具 / 媒体 / 恢复 | 未真实验收，聊天被上游拒绝 |
 | 多账号 / Zen / Go | 无第二实际账号及 Key，未真实验证 |
-| 日常 / Electron | 未执行，仅隔离 DSH web 原生 UI |
+| 日常 / Electron | alpha.3 已备份并通过官方 CLI 升级，实际桌面设置加载通过；不代表聊天通过 |
 
 固定源码将业务码 11128 分类为通道拒绝。调用使用其聊天协议和会话头，保留 DSH attribution；不采用 shim 的提示词扰动。“已连接”与“聊天可用”分别记录。
 
@@ -76,4 +76,15 @@
 - 在插件中点击“确认发送”后显示成功并返回 https://github.com/Yocaihua8/dsh-connect-router/issues/1 。GitHub API 返回该专用 App 的 slug，确认是真实插件发送；正文包含 0 条实际账号日志，没有上传身份、提示词、回复或密钥。
 - 只发现一条测试 Issue，核对内容后关闭为 completed（北京时间 2026-10-26 17:29:46）。并发重复提交和断网后只读核对继续由此前自动化用例覆盖；本轮未额外创建重复 Issue。
 - GitHub 连接器请求失败，读取及关闭改用已登录 GitHub CLI；创建始终由插件完成。GitHub 页面 DOM 与 API 都确认 Closed。截图服务本轮返回 Unable to capture screenshot，未伪造或沿用旧图作为这次发送证据。
-- 该验收只证明反馈授权、预览、创建及链接可用，不改变 WorkBuddy / OpenCode 上游对话拒绝、未验收的模型原生能力和未安装日常 profile 的结论。
+- 该反馈验收只证明授权、预览、创建及链接可用，不改变 WorkBuddy / OpenCode 上游对话拒绝和未验收的模型原生能力结论。日常安装状态以后续 alpha.3 记录为准。
+
+## alpha.3 紧凑界面与日常升级 · 2026-10-26
+
+- 71 项测试通过，包含新增 6 项前后端回归：不可用模型筛选、已保存配置保留、失效窗口不阻塞其他设置、隐藏前未保存修改拦截、恢复可用后的重新校验及 owner 边界。现有保存失败、撤销和额度测试继续通过；没有向真实存储注入失败。
+- 5190 隔离环境使用实际目录检查：WorkBuddy 61 项保留，模型页及账号卡显示 55 项可用模型。Auto 不显示；额度明细和所有重复窗口/最大输出说明均不存在。额度原始数据与路由算法没有改变。
+- 540×604 和 1280×800、深浅主题均检查并保存本地截图。Hy4 preview、GLM-5.3 普通两行模型在窄屏实测 79 CSS px；费用未知模型的授权选项可换行，示例 69 CSS px。页面与设置容器无整体横向溢出，仅上下文选项区域滚动。
+- 960K / 1M 档位显示与选择正常；1M 选择保持可见。上下文键盘箭头选择不会切换模型启用状态；自定义 4095 显示范围错误并禁用保存。切页草稿、撤销、仅看已启用、能力筛选通过；所有临时模型和费用修改已撤销，主题恢复跟随系统。
+- 日常 desktop profile 升级前正常退出，并备份配置、依赖、原包、凭据和 Router 数据。官方 CLI add 返回 0；实际 Electron 设置中 Connect Router、匿名 OpenCode 账号及紧凑模型行正常加载，启动目录返回 9 项可用模型。
+- 升级后核对：凭据、Router 设置、账号集合、Cordis 配置及宿主 app.asar 哈希一致；其他 14 个插件的 2,082 个文件及依赖声明一致。旧模型选择保留，没有自动启用新模型或增加费用授权；其他插件的启动刷新不作为本插件变更。
+- alpha.2 包保留，回滚只用官方 CLI 安装旧包；无需覆盖当前账号和凭据。修订文件清单见 revision-alpha3-files.json；本地安装回执、校验与截图位于 output/router-alpha3-20261026，不随源码上传。
+- 本轮没有重新发送上游聊天，也没有上传真实诊断；此前 WorkBuddy / OpenCode 拒绝以及工具、原生媒体、多账号真实验收缺口仍保留。

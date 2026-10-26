@@ -50,3 +50,31 @@ export function configuredModel(
     reasoning: model.reasoning && caps.reasoning !== false,
   };
 }
+
+// Compare saved behavior, independent of object key and cost-list order.
+export function sameModelSettings(a: ModelSettings, b: ModelSettings): boolean {
+  return (
+    a.enabled === b.enabled &&
+    a.context.mode === b.context.mode &&
+    (a.context.mode !== "custom" ||
+      (b.context.mode === "custom" && a.context.tokens === b.context.tokens)) &&
+    (["tools", "images", "reasoning"] as const).every(
+      (cap) => (a.capabilities[cap] !== false) === (b.capabilities[cap] !== false),
+    ) &&
+    JSON.stringify([...new Set(a.allowedCosts ?? ["free", "credits"])].sort()) ===
+      JSON.stringify([...new Set(b.allowedCosts ?? ["free", "credits"])].sort())
+  );
+}
+
+export function validateModelChange(
+  model: RouterModel,
+  previous: ModelSettings,
+  next: ModelSettings,
+) {
+  if (model.unavailable) {
+    if (!sameModelSettings(previous, next))
+      throw new Error("UNAVAILABLE_MODEL_CHANGED");
+    return;
+  }
+  configuredModel(model, next);
+}

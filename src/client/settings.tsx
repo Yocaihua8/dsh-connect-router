@@ -177,32 +177,8 @@ function Quota({ account }: { account: AccountSnapshot }) {
       {!q.proportional && !!account.quota.length && (
         <small>总量未知或不可比较 · 图形仅表示已知余额构成</small>
       )}
-      <details className="cr-quota-details">
-        <summary>额度明细{q.expired ? ` · ${q.expired} 项已到期` : ""}</summary>
-        {account.quota
-          .filter((item) => item.unit === unit)
-          .map((item, i) => (
-            <div key={i} className="cr-quota-package">
-              <div className="cr-split">
-                <span>{quotaLabels[item.kind]}</span>
-                <span>
-                  {item.remaining === undefined
-                    ? "余额未知"
-                    : number(item.remaining)}
-                  {item.total === undefined ? "" : ` / ${number(item.total)}`}{" "}
-                  {unit}
-                </span>
-              </div>
-              <small>
-                {item.expiresAt === undefined
-                  ? "到期时间未知"
-                  : `${item.expiresAt <= now ? "已到期" : "到期时间"} ${time(item.expiresAt)}`}
-              </small>
-            </div>
-          ))}
-      </details>
       <small>
-        {account.models.length} 个模型 · 更新于 {time(account.updatedAt)}
+        {account.models.filter((model) => !model.unavailable).length} 个可用模型 · 更新于 {time(account.updatedAt)}
       </small>
     </div>
   );
@@ -606,12 +582,33 @@ function ModelRow({
             .map((m) => (
               <span key={m}>{m} 输出</span>
             ))}
+          {(model.cost === "paid" || model.cost === "unknown") && (
+            <label className="cr-cost-consent">
+              <input
+                type="checkbox"
+                checked={config.allowedCosts?.includes(model.cost) ?? false}
+                disabled={client.busy}
+                onChange={(e) =>
+                  client.edit(model, {
+                    allowedCosts: e.target.checked
+                      ? [
+                          ...new Set([
+                            ...(config.allowedCosts || ["free", "credits"]),
+                            model.cost,
+                          ]),
+                        ]
+                      : (config.allowedCosts || []).filter(
+                          (c) => c !== model.cost,
+                        ),
+                  })
+                }
+              />
+              {model.cost === "paid"
+                ? "允许此模型使用付费额度"
+                : "允许调用费用未知的路线"}
+            </label>
+          )}
         </div>
-        <small>
-          上下文{" "}
-          {model.contextWindow ? formatTokens(model.contextWindow) : "未知"} ·
-          最大输出 {model.maxOutput ? formatTokens(model.maxOutput) : "未知"}
-        </small>
         {mode === "custom" && (
           <label className="cr-custom">
             自定义 tokens
@@ -644,35 +641,6 @@ function ModelRow({
             {error}
           </p>
         )}
-        {model.unavailable && (
-          <p className="cr-muted">{describe(model.unavailable)}</p>
-        )}
-        {(model.cost === "paid" || model.cost === "unknown") && (
-          <label className="cr-cost-consent">
-            <input
-              type="checkbox"
-              checked={config.allowedCosts?.includes(model.cost) ?? false}
-              disabled={client.busy}
-              onChange={(e) =>
-                client.edit(model, {
-                  allowedCosts: e.target.checked
-                    ? [
-                        ...new Set([
-                          ...(config.allowedCosts || ["free", "credits"]),
-                          model.cost,
-                        ]),
-                      ]
-                    : (config.allowedCosts || []).filter(
-                        (c) => c !== model.cost,
-                      ),
-                })
-              }
-            />
-            {model.cost === "paid"
-              ? "允许此模型使用付费额度"
-              : "允许调用费用未知的路线"}
-          </label>
-        )}
       </div>
     </div>
   );
@@ -681,12 +649,7 @@ function Models({ client }: { client: RouterClient }) {
   const [search, setSearch] = useState(""),
     [cap, setCap] = useState("all"),
     [enabled, setEnabled] = useState(false);
-  const models = client.snapshot!.models[client.source].filter(
-    (m) =>
-      `${m.name} ${m.id}`.toLowerCase().includes(search.toLowerCase()) &&
-      (!enabled || client.config(m).enabled) &&
-      (cap === "all" || m[cap as Capability]),
-  );
+  const models = client.models(search, cap, enabled);
   return (
     <>
       <AccountPool key={client.source} client={client} />
@@ -1210,6 +1173,7 @@ export function RouterSettingsPage({ client }: { client: RouterClient }) {
     void client.action(() => client.load());
     return stop;
   }, [client]);
+  const validation = client.validation();
   return (
     <div className="dsh-connect-router">
       <h2>Connect Router</h2>
@@ -1310,9 +1274,9 @@ export function RouterSettingsPage({ client }: { client: RouterClient }) {
       )}
       <footer className="cr-footer">
         <div aria-live="polite">
-          {client.error ? (
+          {client.error || validation ? (
             <p className="cr-error" role="alert">
-              {client.error}
+              {client.error || validation}
             </p>
           ) : client.busy ? (
             "正在处理…"
@@ -1332,7 +1296,7 @@ export function RouterSettingsPage({ client }: { client: RouterClient }) {
           )}
           <Button
             variant="primary"
-            disabled={!client.dirty || client.busy || !!client.validation()}
+            disabled={!client.dirty || client.busy || !!validation}
             onClick={() => void client.save()}
           >
             保存设置

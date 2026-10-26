@@ -1,0 +1,97 @@
+{
+  "version": "0.1.0-alpha.3",
+  "baseline": "749b1a2",
+  "files": [
+    {
+      "path": "README.md",
+      "change": "modified",
+      "sha256": "1c0b84bfd3495543dd977be8d190358a7a03f347e7ab9e42aa1ea368422153ac",
+      "purpose": "当前版本、紧凑界面与配置保留说明"
+    },
+    {
+      "path": "docs/changes.md",
+      "change": "modified",
+      "sha256": "1391bb52816880aee3e1badd8e842166cfdacf8dc7a9273d4675a4427aa63334",
+      "purpose": "alpha.3 变更记录与文件清单入口"
+    },
+    {
+      "path": "docs/installation.md",
+      "change": "modified",
+      "sha256": "fe798ce4d220a5beac69ea8afc31aca7ffe68df057410b224803dc1737a54946",
+      "purpose": "日常升级及 alpha.2 回滚说明"
+    },
+    {
+      "path": "docs/verification.md",
+      "change": "modified",
+      "sha256": "859e54e9bfbcd26547d3949b96d8583a20b8dc621c5d3bc5d2c62c5201456c85",
+      "purpose": "自动化、隔离与真实桌面验收边界"
+    },
+    {
+      "path": "docs/release-checks.json",
+      "change": "modified",
+      "sha256": "afeff9604ea6df717281c1c8114ce928d5ab6157c74a7fd625d5953af5f28bd6",
+      "purpose": "当前版本可机读验证记录"
+    },
+    {
+      "path": "package.json",
+      "change": "modified",
+      "sha256": "ce821f90ada7f2e0c283f8804ec3b1f19941fe18543f3966b32d6856dc39f604",
+      "purpose": "版本升级为 0.1.0-alpha.3"
+    },
+    {
+      "path": "package-lock.json",
+      "change": "modified",
+      "sha256": "4180ae67815c471fab8a5bf7e953e785a8a0856b16e72e4fe511183a87da8fa5",
+      "purpose": "同步版本锁定信息"
+    },
+    {
+      "path": "src/client/controller.ts",
+      "change": "modified",
+      "sha256": "ba1573c70591e0ace9380647d532de62ec6fdc1195d50f9e5c6d27189fab27c2",
+      "purpose": "可用目录筛选与隐藏草稿校验"
+    },
+    {
+      "path": "src/client/settings.tsx",
+      "change": "modified",
+      "sha256": "3f8f3015d9b6759453a0f187fb41805bdacfb034e6c50c030ea5e7a044a7364b",
+      "purpose": "删除额度明细/重复说明，数量与底部校验提示"
+    },
+    {
+      "path": "src/client/style.css",
+      "change": "modified",
+      "sha256": "b4ae628f19ace839b03221ff95678fd7cbe2dd8b824b4d6b262f4986497b6a9e",
+      "purpose": "8px 模型行留白、4px 行距及能力换行"
+    },
+    {
+      "path": "src/host/model-settings.ts",
+      "change": "modified",
+      "sha256": "244b02d2bf9197fac6cd579c13b973a6a837f0f1d8867d5f7fa729c22a1b8d9f",
+      "purpose": "隐藏模型设置等价判断及后端校验"
+    },
+    {
+      "path": "src/host/service.ts",
+      "change": "modified",
+      "sha256": "3757397bc4c82e3215db0049134b12fdb16997cb1e2445552ee87b995fc7b870",
+      "purpose": "保存时比较原配置，拒绝隐藏项修改"
+    },
+    {
+      "path": "src/shared/feedback.ts",
+      "change": "modified",
+      "sha256": "37b9c77e5dbcc49c0dbe50bfd3947b9885e2bd51bdc972121410e44d9d42d4b6",
+      "purpose": "诊断版本同步 alpha.3"
+    },
+    {
+      "path": "test/client.test.ts",
+      "change": "modified",
+      "sha256": "a12e916b461c0ac846bf77df0acb0b77cc75e5013afcf5c6a1202d091840fba3",
+      "purpose": "筛选、恢复与隐藏草稿回归"
+    },
+    {
+      "path": "test/hidden-model-settings.test.ts",
+      "change": "added",
+      "sha256": "360c12a60dd59acc812bd725e1af37604c511dfe5a54687ce66214acb40d6d1d",
+      "purpose": "实际保存入口配置保留、拒绝及权限回归"
+    }
+  ],
+  "self": "docs/revision-alpha3-files.json 新增文件清单（不计算自身哈希）"
+}
