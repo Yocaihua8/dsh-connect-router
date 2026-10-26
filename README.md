@@ -25,6 +25,6 @@ Connect Router 是面向本机个人使用的独立 DSH 插件，连接 WorkBudd
 
 见 [安装与回滚](docs/installation.md)、[实际验证](docs/verification.md)、[剩余事项](docs/remaining.md)。本轮没有安装到日常 profile。原型在 ../output/router-ui-prototype-20261026（5188，仅演示数据）；独立 DSH 验证在 5190。
 
-反馈入口可预览脱敏诊断并经确认直接发送到 [公开 Issues](https://github.com/Yocaihua8/dsh-connect-router/issues)。首次使用 GitHub 官方设备授权，目标 App 为 Yocaihua8 Connect Router Feedback；不需要输入 GitHub 密码或提供 PAT。详见 [隐私说明](PRIVACY.md)。
+反馈入口可预览脱敏诊断并经确认直接发送到 [公开 Issues](https://github.com/Yocaihua8/dsh-connect-router/issues)。首次使用 GitHub 官方设备授权，目标 App 为 Yocaihua8 Connect Router Feedback；不需要输入 GitHub 密码或提供 PAT。真实合成报告已通过插件发送并验收关闭，见 [测试 Issue #1](https://github.com/Yocaihua8/dsh-connect-router/issues/1)；没有上传实际账号日志。详见 [隐私说明](PRIVACY.md)。
 
 来源见 [第三方声明](THIRD_PARTY_NOTICES.md)，OpenCode 复用模块已获作者 MIT 公开许可。目标 SDK 的 Zod 公告尚未解决；仍是实验性 alpha，完整真实调用验收未通过。vendor 提取脚本只供溯源，不要重新运行覆盖已适配代码。

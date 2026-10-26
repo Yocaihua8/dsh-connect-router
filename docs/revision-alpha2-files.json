@@ -29,7 +29,7 @@
     {
       "path": "README.md",
       "change": "modified",
-      "sha256": "f405a4ec69685dee03260f76b3e52247f3a2ca7f107dee5e0822459caabf0b80",
+      "sha256": "4a488696b6bb5245b1fb86deb6c372c4dd6b485a62daee6fa670d3b10c46ea02",
       "purpose": "文档、配置或公开仓库说明"
     },
     {
@@ -53,7 +53,7 @@
     {
       "path": "docs/release-checks.json",
       "change": "modified",
-      "sha256": "acfafe7e0810bb9025ce1a7a805ae2bf89e0bf69d57c61b92bdef324a42f0f14",
+      "sha256": "ae4b5ceff0df5801c43cb06fd43fcc3f57c3d5d01cd271dee319bb79c3c01d33",
       "purpose": "文档、配置或公开仓库说明"
     },
     {
@@ -65,7 +65,7 @@
     {
       "path": "docs/verification.md",
       "change": "modified",
-      "sha256": "98ced58551ecef9953d4fec9fba4b638ed52a52aa9814fff2a25cd20241e94cd",
+      "sha256": "dd23e95c7f950a13a95766caab3194183c7dfe29787bf3c129c9ff61c048721d",
       "purpose": "文档、配置或公开仓库说明"
     },
     {

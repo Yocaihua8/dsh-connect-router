@@ -47,7 +47,18 @@
     "nativeTools": "not passed",
     "nativeMedia": "not passed",
     "dailyInstall": "not run",
-    "electron": "not run"
+    "electron": "not run",
+    "githubFeedback": {
+      "authorization": "passed-device-flow",
+      "creation": "passed-plugin-direct",
+      "issue": "https://github.com/Yocaihua8/dsh-connect-router/issues/1",
+      "viaApp": "yocaihua8-connect-router-feedback",
+      "realLogCount": 0,
+      "state": "closed",
+      "reason": "completed",
+      "closedAt": "2026-10-26T17:29:46+08:00",
+      "screenshot": "unavailable; DOM and GitHub API verified"
+    }
   },
   "ui": {
     "viewports": [
@@ -69,5 +80,5 @@
       "lastRestart": "DSH locale uiConversation.binding unknown session during initialization; settings usable"
     }
   },
-  "releaseStatus": "alpha-real-chat-blocked-feedback-acceptance-pending"
+  "releaseStatus": "alpha-feedback-accepted-real-chat-blocked"
 }
