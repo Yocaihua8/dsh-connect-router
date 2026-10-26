@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-26",
+  "version": "0.1.0-alpha.2",
+  "dsh": "0.2.1-rc.3",
+  "commands": [
+    {
+      "command": "npm run check",
+      "status": "passed",
+      "tests": 65,
+      "typecheckProjects": 3,
+      "build": "host/client/declarations/typert"
+    },
+    {
+      "command": "npm run check:package",
+      "status": "passed"
+    },
+    {
+      "command": "prototype: npm test",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "command": "prototype: npm run test:sites",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "command": "prototype: npm run build",
+      "status": "passed",
+      "warning": "native shell bundle exceeds 500kB"
+    },
+    {
+      "command": "npm audit --json",
+      "status": "failed",
+      "affectedHighDependencyNodes": 39,
+      "advisory": "GHSA-mrhx-c7xc-m3w5"
+    }
+  ],
+  "actual": {
+    "workbuddyAuthorization": "passed",
+    "workbuddyCatalog": "61 models",
+    "workbuddyCheckin": "confirmed",
+    "workbuddyActivities": "already claimed; none eligible",
+    "workbuddyChat": "HTTP 400 UPSTREAM_CHANNEL_REJECT",
+    "opencodeCatalog": "9 public models",
+    "opencodeChat": "UPSTREAM_REJECTED",
+    "nativeTools": "not passed",
+    "nativeMedia": "not passed",
+    "dailyInstall": "not run",
+    "electron": "not run"
+  },
+  "ui": {
+    "viewports": [
+      "540x604",
+      "1280x800"
+    ],
+    "themes": [
+      "dark",
+      "light"
+    ],
+    "draft": "passed",
+    "contextValidation": "passed",
+    "menus": "passed",
+    "logFilters": "passed",
+    "redactedDownload": "passed",
+    "mockDataInProduction": false,
+    "console": {
+      "interactions": "no warnings/errors",
+      "lastRestart": "DSH locale uiConversation.binding unknown session during initialization; settings usable"
+    }
+  },
+  "releaseStatus": "alpha-real-chat-blocked-feedback-acceptance-pending"
+}

@@ -1,0 +1,35 @@
+{
+  "repository": "https://github.com/Yocaihua8/dsh-link-opencode",
+  "head": "b5ffd63916bbb86fbadc181e917f9c85052126d1",
+  "status": [
+    "M README.md",
+    " M client.js",
+    " M lib/index.js",
+    " M lib/paths.js",
+    " M lib/routes.js",
+    "?? test/client.test.mjs",
+    "?? test/routes.test.mjs"
+  ],
+  "files": [
+    {
+      "path": "lib/backend.js",
+      "sha256": "b4bd0f9205dd58065ccee88a6916d73c9392cc42757e12481e8d6cd8da8ce2a0"
+    },
+    {
+      "path": "lib/bridge.js",
+      "sha256": "96b3cb05c29db8591b61c08e720d6fd328e39ed0b9775fe0191350ae252e878e"
+    },
+    {
+      "path": "lib/protocol.js",
+      "sha256": "d1ce4d2bc356c7d9ef346d0a40cf1307f6433aeb2dbcac1f50613590498b0a9c"
+    },
+    {
+      "path": "lib/runtime.js",
+      "sha256": "2fdd4706b776dcf8d907183050288da79f7089d2d67ddfda0a3e5072be3f0ce7"
+    },
+    {
+      "path": "lib/catalog.js",
+      "sha256": "7339579ba6554457caf80ee1bcff4a5c442592c787915cf1ebde892900597a77"
+    }
+  ]
+}

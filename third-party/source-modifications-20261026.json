@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-26",
+  "note": "Adapted source hashes; original receipts remain unchanged.",
+  "files": [
+    {
+      "path": "src/host/opencode/vendor/backend.js",
+      "sha256": "d70b3c368656786fbd9f1c670039d9f1092018a9cee9d764ff706671dd8afecb"
+    },
+    {
+      "path": "src/host/opencode/vendor/bridge.js",
+      "sha256": "8558cdfb6ccafe59be441de14abfaddc630e87cbfe8c49d213dfa2eacb2f33cc"
+    },
+    {
+      "path": "src/host/opencode/vendor/catalog.js",
+      "sha256": "3eba108f032408988870a033e2d6c03580082df13e436dc669042d3ee347ace7"
+    },
+    {
+      "path": "src/host/opencode/vendor/protocol.js",
+      "sha256": "8abca4a67334d53a90b67c4e1c173d014ff10118cd7c4909b42465281856e76d"
+    },
+    {
+      "path": "src/host/opencode/vendor/runtime.js",
+      "sha256": "82a40eea3793ebdb8211efc887b25b0296d8c0349b7a7fd92d2a3925387de991"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/auth.ts",
+      "sha256": "ee3812a1b445210bb4e597a66ce25ed7b8cdc06ad2e8a6f9a9d2678447e86d48"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/busy.ts",
+      "sha256": "cd2b757df4acc128fdb1e5a2a2e4c7a1437ae627f43d6e4997cb6e0df69830ba"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/context-rescue.ts",
+      "sha256": "6ee2254563a8967d2658789ac994b00dd0d017f08715589296cd0817e0e85e05"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/native-modality.ts",
+      "sha256": "a2b47adbd74602632475cd03260a8a64fe9c32102bce338dce5b9935286971b3"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/oauth.ts",
+      "sha256": "eda9316a077ed70451f6704d4782e8afeba0b2637352546c7da53d31139baa46"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/promo.ts",
+      "sha256": "ba11e33ead5bd1fae8285fda54f8230d13ad1276b364e34acd334a78574aa751"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/queue.ts",
+      "sha256": "f716ff3908c8c2c46ede615f81f6f731eeccf373ee3c3ab3f51aa8ab437f3343"
+    },
+    {
+      "path": "src/host/workbuddy/vendor/upstream.ts",
+      "sha256": "9fbeadd934db3ec5e146be6da8dee0460f5924262509d6bfb01bc23e389eb06a"
+    }
+  ]
+}

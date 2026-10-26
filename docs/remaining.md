@@ -1,0 +1,16 @@
+# 剩余工作与真实阻塞
+
+用户已确认原型，正式 UI、Typert、patch、账号池及隔离安装已实现。以下仍未通过，不能用模块测试替代：
+
+1. WorkBuddy 登录、目录、额度和签到成功，但 DSH Hy3 对话 HTTP 400 / UPSTREAM_CHANNEL_REJECT。固定上游模块将业务码 11128 归入通道校验拒绝。没有扰动系统指令、隐藏重试或换号规避；需上游提供支持此通道的接入方式后复验。
+2. OpenCode 公共目录可读取，DSH Big Pickle 返回 UPSTREAM_REJECTED；此前独立调用明确返回 Free usage limit reached。Zen / Go 未提供实际 Key，未验证授权与聊天。
+3. 两来源聊天受阻，真实工具往返、截断续写、摘要超限分块恢复、图片输入回放未完成。宿主事务接线及保护边界有受控测试，不能代替实际通过。
+4. 当前实现文本、推理、工具和图片输入。目录中的原生图片/音频/视频输出及其他输入保留“未接入/不可用”，尚无对应 DSH 展示和历史回放，不能声称所有原生能力已接通。
+5. 只有一个实际 WorkBuddy 账号；真实跨账号分配、凭据过期轮转、非 owner 会话和长时间运行尚待集成验证。模块测试覆盖账号隔离、排序和并发持久绑定。
+6. 当前活动均已领取，验收仅为“已领取 / 暂无可领取活动”；有新活动时再验串行领取。
+7. SDK 精确依赖 Zod 4.4.3，命中 GHSA-mrhx-c7xc-m3w5；需兼容修复并复验，未执行 audit fix --force。
+8. OpenCode 来源历史 LICENSE 缺失已通过作者本轮明确授权解决：五个复用模块可按 MIT 公开，保留来源和补充许可文本。
+9. 未安装日常 profile，未做 Windows Electron 验收。本轮为独立 DSH web profile 原生 UI，安装前按 installation.md 备份。
+10. 最后重启后出现宿主 locale / uiConversation.binding 的 unknown session 初始化错误；需在后续宿主兼容验收中跟踪，未修改宿主来掩盖该记录。
+
+恢复开发先读取 verification.md，保留实际账号凭据与未提交改动。视觉确认已完成，无需再等待视觉许可。

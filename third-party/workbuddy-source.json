@@ -1,0 +1,55 @@
+{
+  "repository": "https://github.com/dingminhua/dsh-connect-workbuddy",
+  "commit": "3b558326a962aa2cfa57ff558b452f7635b447ac",
+  "files": [
+    {
+      "source": "src/upstream.ts",
+      "sha256": "b02a9c7005ab7fabee9cc413bd9230a046475bf75951577ecca8c19ada6221ff",
+      "selectedRoots": [
+        "WorkBuddyUpstreamClient",
+        "WorkBuddyCredentialRejectedError",
+        "parseCreditMultiplier",
+        "regionOf"
+      ],
+      "initialExtractSha256": "c9894696bc817ff324141f4f9e097ccbbd9837867b5ebd8bd626c2ee5934a5ca"
+    },
+    {
+      "source": "src/auth.ts",
+      "sha256": "786f24191313f204465442cba09fa9c91f8653ffd35be136f1e3a4c48ce67e55",
+      "selectedRoots": [
+        "WorkBuddyCredential"
+      ],
+      "initialExtractSha256": "ee3812a1b445210bb4e597a66ce25ed7b8cdc06ad2e8a6f9a9d2678447e86d48"
+    },
+    {
+      "source": "src/oauth.ts",
+      "sha256": "234c1f03aa6098fbdc02e6fe7f3d8e65062e0986aac7da2bdcfd1097a0f707fb",
+      "copied": true
+    },
+    {
+      "source": "src/context-rescue.ts",
+      "sha256": "28291971fc22eff4b778d9ced25b1b315488e601fb949359b5982f991ffb1d27",
+      "copied": true
+    },
+    {
+      "source": "src/promo.ts",
+      "sha256": "ba11e33ead5bd1fae8285fda54f8230d13ad1276b364e34acd334a78574aa751",
+      "copied": true
+    },
+    {
+      "source": "src/queue.ts",
+      "sha256": "f716ff3908c8c2c46ede615f81f6f731eeccf373ee3c3ab3f51aa8ab437f3343",
+      "copied": true
+    },
+    {
+      "source": "src/native-modality.ts",
+      "sha256": "a2b47adbd74602632475cd03260a8a64fe9c32102bce338dce5b9935286971b3",
+      "copied": true
+    },
+    {
+      "source": "src/busy.ts",
+      "sha256": "cd2b757df4acc128fdb1e5a2a2e4c7a1437ae627f43d6e4997cb6e0df69830ba",
+      "copied": true
+    }
+  ]
+}

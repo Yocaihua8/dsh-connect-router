@@ -1,0 +1,14 @@
+node_modules/
+lib/
+.cache/
+output/
+*.tgz
+.env
+.env.*
+auth.json
+credentials.yml
+credentials.yaml
+*.pem
+*.key
+*.log
+.DS_Store

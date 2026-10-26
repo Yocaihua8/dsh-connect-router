@@ -1,0 +1,24 @@
+name: 问题反馈
+description: 提交复现步骤和脱敏诊断
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: 请勿提交账号、密钥、提示词、回复或原始 DSH home。插件内可先预览脱敏报告再发送。
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤、预期与实际结果
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 插件 / DSH 版本与操作系统
+    validations:
+      required: true
+  - type: textarea
+    id: diagnosis
+    attributes:
+      label: 已检查的脱敏诊断
+      description: 可附错误码、模型路线和请求标识，不要粘贴原始凭据或对话正文。
