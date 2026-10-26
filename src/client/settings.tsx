@@ -141,7 +141,7 @@ function Quota({ account }: { account: AccountSnapshot }) {
           />
         )}
         <strong>
-          {!account.quota.length
+          {!account.quota.length || (q.unknown && !q.knownCount)
             ? "额度未知"
             : `${q.unknown ? "已知 " : ""}${number(q.known)}${q.proportional ? ` / ${number(q.total!)}` : ""} ${unit}`}
         </strong>
@@ -150,7 +150,7 @@ function Quota({ account }: { account: AccountSnapshot }) {
         className="cr-quota-bar"
         role="img"
         aria-label={
-          q.proportional
+          !account.quota.length || (q.unknown && !q.knownCount) ? "额度未知，不显示使用比例" : q.proportional
             ? `可用 ${number(q.known)}，总量 ${number(q.total!)} ${unit}`
             : `已知余额构成 ${number(q.known)} ${unit}，不表示使用比例`
         }
@@ -168,8 +168,8 @@ function Quota({ account }: { account: AccountSnapshot }) {
         {q.groups.map((g) => (
           <span key={g.kind}>
             <i className={`cr-quota-${g.kind}`} />
-            {quotaLabels[g.kind]} {number(g.known)}
-            {g.unknown ? " + 未知" : ""}
+            {quotaLabels[g.kind]} {g.knownCount ? number(g.known) : "未知"}
+            {g.unknown && g.knownCount ? " + 未知" : ""}
           </span>
         ))}
       </div>

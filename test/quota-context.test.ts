@@ -39,6 +39,10 @@ test("unknown/invalid quota never becomes zero usage or a fake percentage", () =
   );
   assert.equal(q.known, 10);
   assert.equal(q.unknown, true);
+  assert.equal(q.knownCount, 1);
+  const missing = summarizeQuota([{ kind: "unknown", unit: "c" }], "c");
+  assert.equal(missing.knownCount, 0);
+  assert.equal(missing.unknown, true);
   assert.equal(q.total, undefined);
   assert.equal(q.proportional, false);
   assert.equal(

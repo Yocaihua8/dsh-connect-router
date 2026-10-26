@@ -23,6 +23,7 @@ export function summarizeQuota(
       return {
         kind,
         count: rows.length,
+        knownCount: rows.filter((q) => valid(q.remaining)).length,
         known: rows.reduce(
           (s, q) => s + (valid(q.remaining) ? q.remaining : 0),
           0,
@@ -41,6 +42,7 @@ export function summarizeQuota(
   return {
     groups,
     known,
+    knownCount: groups.reduce((s, g) => s + g.knownCount, 0),
     unknown: groups.some((g) => g.unknown),
     total,
     proportional: total !== undefined && total > 0,
